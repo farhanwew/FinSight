@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinSight - Financial Insight</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons (Correct version for plain JS) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Custom CSS File -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-900 text-white antialiased">
+
+    <!-- Authentication Screen -->
+    <div id="auth-screen">
+        <div class="flex items-center justify-center min-h-screen bg-slate-900">
+            <div class="w-full max-w-md p-8 space-y-6 bg-slate-800 rounded-xl shadow-lg">
+                <div class="text-center">
+                    <div class="flex justify-center items-center space-x-2 mb-4">
+                        <i data-lucide="bar-chart-3" class="text-indigo-400 h-8 w-8"></i>
+                        <h1 class="text-3xl font-bold">FinSight</h1>
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="space-y-6">
+                    <h2 class="text-xl font-bold text-center">Masuk ke Akun Anda</h2>
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-slate-300">Alamat Email</label>
+                        <input type="email" id="login-email" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" value="user@finsight.com">
+                    </div>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-slate-300">Password</label>
+                        <input type="password" id="login-password" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" value="password123">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors duration-200">
+                        Masuk
+                    </button>
+                    <p class="text-sm text-center text-slate-400">
+                        Belum punya akun? <a href="#" id="show-register-btn" class="font-medium text-indigo-400 hover:underline">Daftar di sini</a>
+                    </p>
+                </form>
+
+                <!-- Register Form (Initially Hidden) -->
+                <form id="register-form" class="space-y-6 hidden">
+                    <h2 class="text-xl font-bold text-center">Buat Akun Baru</h2>
+                    <div>
+                        <label for="register-name" class="block text-sm font-medium text-slate-300">Nama Lengkap</label>
+                        <input type="text" id="register-name" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: Budi Santoso">
+                    </div>
+                    <div>
+                        <label for="register-email" class="block text-sm font-medium text-slate-300">Alamat Email</label>
+                        <input type="email" id="register-email" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="budi@email.com">
+                    </div>
+                    <div>
+                        <label for="register-password" class="block text-sm font-medium text-slate-300">Password</label>
+                        <input type="password" id="register-password" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors duration-200">
+                        Daftar
+                    </button>
+                    <p class="text-sm text-center text-slate-400">
+                        Sudah punya akun? <a href="#" id="show-login-btn" class="font-medium text-indigo-400 hover:underline">Masuk di sini</a>
+                    </p>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main Application Screen (Initially Hidden) -->
+    <div id="app-screen" class="hidden">
+        <div class="flex h-screen">
+            <!-- Sidebar Navigation -->
+            <nav class="w-64 bg-slate-800 p-5 flex flex-col justify-between shadow-lg">
+                <div>
+                    <div class="flex items-center space-x-2 mb-10">
+                        <i data-lucide="bar-chart-3" class="text-indigo-400"></i>
+                        <h1 class="text-2xl font-bold">FinSight</h1>
+                    </div>
+                    <ul class="space-y-2" id="nav-links">
+                        <li><a href="#" class="nav-link active flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+                        <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="manajemen"><i data-lucide="wallet"></i><span>Manajemen Keuangan</span></a></li>
+                        <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="prediksi"><i data-lucide="trending-up"></i><span>Prediksi Arus Kas</span></a></li>
+                        <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="rekomendasi"><i data-lucide="lightbulb"></i><span>Rekomendasi Usaha</span></a></li>
+                        <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="analisis"><i data-lucide="ruler"></i><span>Analisis Kelayakan</span></a></li>
+                        <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="tips"><i data-lucide="newspaper"></i><span>Tips & Insight</span></a></li>
+                    </ul>
+                </div>
+                <div>
+                     <a href="#" id="logout-btn" class="flex items-center space-x-3 p-2 rounded-md text-slate-400 hover:bg-red-600 hover:text-white transition-colors duration-200">
+                        <i data-lucide="log-out"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-8 overflow-y-auto">
+                <div class="flex justify-between items-center mb-8">
+                     <h2 class="text-3xl font-bold" id="page-title">Dashboard</h2>
+                     <div class="flex items-center space-x-4">
+                         <i data-lucide="bell" class="text-slate-400 hover:text-white cursor-pointer"></i>
+                         <div class="flex items-center space-x-2">
+                             <img id="user-avatar-display" src="https://placehold.co/40x40/6366f1/ffffff?text=U" class="rounded-full" alt="User Avatar">
+                             <div>
+                                <p id="user-name-display" class="font-semibold">Jolly Watson</p>
+                                <p class="text-xs text-slate-400">UMKM</p>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+
+                <!-- Page Content Container -->
+                <div id="content-container">
+                    <!-- Dashboard Page -->
+                    <div id="page-dashboard" class="page-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-slate-400 text-sm">Total Pemasukan</h3>
+                                <p class="text-3xl font-bold text-green-400" id="total-pemasukan">Rp 0</p>
+                            </div>
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-slate-400 text-sm">Total Pengeluaran</h3>
+                                <p class="text-3xl font-bold text-red-400" id="total-pengeluaran">Rp 0</p>
+                            </div>
+                             <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-slate-400 text-sm">Saldo Saat Ini</h3>
+                                <p class="text-3xl font-bold text-indigo-400" id="saldo-saat-ini">Rp 0</p>
+                            </div>
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-slate-400 text-sm">Transaksi Bulan Ini</h3>
+                                <p class="text-3xl font-bold" id="total-transaksi">0</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-2 bg-slate-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="font-semibold mb-4">Grafik Arus Kas (6 Bulan Terakhir)</h3>
+                                <canvas id="cashflowChart"></canvas>
+                            </div>
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                                 <h3 class="font-semibold mb-4">Kategori Pengeluaran</h3>
+                                 <canvas id="categoryPieChartDashboard"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manajemen Keuangan Page -->
+                    <div id="page-manajemen" class="page-content hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                            <div class="lg:col-span-2 bg-slate-800 p-6 rounded-lg shadow-lg h-fit">
+                                <h3 class="font-semibold text-xl mb-4">Tambah Transaksi Baru</h3>
+                                <form id="transaction-form" class="space-y-4">
+                                    <div>
+                                        <label for="tx-date" class="block text-sm font-medium text-slate-300">Tanggal</label>
+                                        <input type="date" id="tx-date" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label for="tx-type" class="block text-sm font-medium text-slate-300">Jenis</label>
+                                        <select id="tx-type" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500">
+                                            <option value="pemasukan">Pemasukan</option>
+                                            <option value="pengeluaran">Pengeluaran</option>
+                                        </select>
+                                    </div>
+                                     <div>
+                                        <label for="tx-amount" class="block text-sm font-medium text-slate-300">Jumlah (Rp)</label>
+                                        <input type="number" id="tx-amount" placeholder="500000" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label for="tx-category" class="block text-sm font-medium text-slate-300">Kategori</label>
+                                        <input type="text" id="tx-category" placeholder="Contoh: Penjualan Produk, Gaji" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label for="tx-description" class="block text-sm font-medium text-slate-300">Deskripsi</label>
+                                        <textarea id="tx-description" rows="2" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                                    </div>
+                                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200">Simpan Transaksi</button>
+                                </form>
+                            </div>
+                            <div class="lg:col-span-3 bg-slate-800 p-6 rounded-lg shadow-lg">
+                                 <h3 class="font-semibold text-xl mb-4">Riwayat Transaksi</h3>
+                                 <div class="overflow-x-auto">
+                                    <table class="w-full text-left">
+                                        <thead>
+                                            <tr class="border-b border-slate-600">
+                                                <th class="p-3">Tanggal</th>
+                                                <th class="p-3">Deskripsi</th>
+                                                <th class="p-3">Kategori</th>
+                                                <th class="p-3 text-right">Jumlah</th>
+                                                <th class="p-3 text-center">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="transaction-table-body">
+                                            <!-- Rows will be inserted by JS -->
+                                        </tbody>
+                                    </table>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other pages remain the same -->
+                    <!-- Prediksi Arus Kas Page -->
+                    <div id="page-prediksi" class="page-content hidden">
+                        <div class="bg-slate-800 p-8 rounded-lg shadow-lg text-center">
+                            <h3 class="text-2xl font-bold mb-4">Prediksi Arus Kas Bulan Depan</h3>
+                            <p class="text-slate-400 mb-6">Gunakan data historis Anda untuk mendapatkan estimasi keuangan di bulan berikutnya.</p>
+                            <button id="generate-prediction-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md transition-colors duration-200">
+                                <i data-lucide="brain-circuit" class="inline-block mr-2"></i>Buat Prediksi Sekarang
+                            </button>
+                            <div id="prediction-result" class="mt-8 hidden">
+                                <div id="prediction-loading" class="flex justify-center items-center space-x-2">
+                                    <i data-lucide="loader-2" class="animate-spin"></i>
+                                    <span>Menganalisis data...</span>
+                                </div>
+                                <div id="prediction-output" class="hidden text-left">
+                                    <h4 class="font-bold text-xl mb-4">Hasil Prediksi:</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                                        <div class="bg-slate-700 p-4 rounded-lg">
+                                            <p class="text-slate-400">Estimasi Pemasukan</p>
+                                            <p id="predicted-income" class="text-2xl font-bold text-green-400"></p>
+                                        </div>
+                                        <div class="bg-slate-700 p-4 rounded-lg">
+                                            <p class="text-slate-400">Estimasi Pengeluaran</p>
+                                            <p id="predicted-expense" class="text-2xl font-bold text-red-400"></p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6 bg-indigo-900/50 border border-indigo-500 p-4 rounded-lg">
+                                        <h5 class="font-semibold flex items-center"><i data-lucide="sparkles" class="text-yellow-400 mr-2"></i>Insight Otomatis</h5>
+                                        <p id="prediction-insight" class="mt-2 text-slate-300"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rekomendasi Usaha Page -->
+                    <div id="page-rekomendasi" class="page-content hidden">
+                        <div class="bg-slate-800 p-8 rounded-lg shadow-lg">
+                             <h3 class="text-2xl font-bold mb-2">Rekomendasi Usaha Berbasis AI</h3>
+                             <p class="text-slate-400 mb-6">Isi data berikut untuk mendapatkan ide usaha yang paling cocok untuk Anda.</p>
+                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div>
+                                    <label for="rec-modal" class="block text-sm font-medium text-slate-300">Modal Tersedia (Rp)</label>
+                                    <input type="number" id="rec-modal" value="5000000" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1">
+                                </div>
+                                 <div>
+                                    <label for="rec-minat" class="block text-sm font-medium text-slate-300">Minat Bidang Usaha</label>
+                                    <input type="text" id="rec-minat" placeholder="Contoh: Kuliner, Fashion, Teknologi" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1">
+                                </div>
+                                 <div>
+                                    <label for="rec-lokasi" class="block text-sm font-medium text-slate-300">Lokasi (Kota)</label>
+                                    <input type="text" id="rec-lokasi" placeholder="Contoh: Surabaya" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1">
+                                </div>
+                             </div>
+                             <div class="text-center">
+                                <button id="generate-recommendation-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md transition-colors duration-200">
+                                    <i data-lucide="search" class="inline-block mr-2"></i>Temukan Ide Usaha
+                                </button>
+                            </div>
+                            <div id="recommendation-result" class="mt-8 hidden">
+                               <div id="recommendation-loading" class="flex justify-center items-center space-x-2">
+                                    <i data-lucide="loader-2" class="animate-spin"></i>
+                                    <span>Mencari rekomendasi terbaik...</span>
+                                </div>
+                                <div id="recommendation-output" class="hidden">
+                                    <h4 class="font-bold text-xl mb-4">Top 3 Rekomendasi Usaha Untuk Anda:</h4>
+                                    <div id="recommendation-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        <!-- Recommendation cards will be inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analisis Kelayakan Usaha Page -->
+                    <div id="page-analisis" class="page-content hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-xl font-bold mb-4">Kalkulator Kelayakan Usaha</h3>
+                                <form id="feasibility-form" class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-300">Modal Awal (Rp)</label>
+                                        <input type="number" id="fea-modal" placeholder="10000000" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-300">Biaya Operasional / Bulan (Rp)</label>
+                                        <input type="number" id="fea-biaya" placeholder="3000000" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-300">Estimasi Pemasukan / Bulan (Rp)</label>
+                                        <input type="number" id="fea-pemasukan" placeholder="5000000" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1">
+                                    </div>
+                                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">Analisis Sekarang</button>
+                                </form>
+                            </div>
+                            <div id="feasibility-result" class="bg-slate-800 p-6 rounded-lg shadow-lg hidden">
+                                <h3 class="text-xl font-bold mb-4">Hasil Analisis</h3>
+                                <div id="feasibility-output" class="space-y-4">
+                                    <div id="feasibility-status" class="p-4 rounded-md font-bold text-center text-lg"></div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-slate-700 p-4 rounded-lg">
+                                            <p class="text-slate-400">Profit Bersih / Bulan</p>
+                                            <p id="fea-profit" class="text-xl font-bold"></p>
+                                        </div>
+                                        <div class="bg-slate-700 p-4 rounded-lg">
+                                            <p class="text-slate-400">Return on Investment (ROI)</p>
+                                            <p id="fea-roi" class="text-xl font-bold"></p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-slate-700 p-4 rounded-lg">
+                                        <p class="text-slate-400">Perkiraan Waktu Balik Modal (Break-Even Point)</p>
+                                        <p id="fea-bep" class="text-xl font-bold"></p>
+                                    </div>
+                                    <canvas id="breakEvenChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tips & Insight Page -->
+                    <div id="page-tips" class="page-content hidden">
+                        <div class="space-y-6">
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg flex items-start space-x-4">
+                                <i data-lucide="trending-up" class="text-indigo-400 w-8 h-8 mt-1"></i>
+                                <div>
+                                    <h3 class="font-bold text-lg">5 Cara Mengatur Keuangan Usaha Mikro</h3>
+                                    <p class="text-slate-400 mt-1">Pisahkan rekening pribadi dan usaha, catat semua transaksi, buat anggaran rutin...</p>
+                                    <a href="#" class="text-indigo-400 hover:underline mt-2 inline-block">Baca Selengkapnya</a>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg flex items-start space-x-4">
+                                 <i data-lucide="coffee" class="text-indigo-400 w-8 h-8 mt-1"></i>
+                                <div>
+                                    <h3 class="font-bold text-lg">Tren UMKM di Surabaya: Kopi Masih Jadi Primadona!</h3>
+                                    <p class="text-slate-400 mt-1">Analisis pasar menunjukkan bahwa usaha kedai kopi dengan konsep unik masih memiliki potensi besar di Surabaya...</p>
+                                    <a href="#" class="text-indigo-400 hover:underline mt-2 inline-block">Baca Selengkapnya</a>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg flex items-start space-x-4">
+                                <i data-lucide="megaphone" class="text-indigo-400 w-8 h-8 mt-1"></i>
+                                <div>
+                                    <h3 class="font-bold text-lg">Tips Pemasaran Digital dengan Budget Terbatas</h3>
+                                    <p class="text-slate-400 mt-1">Manfaatkan media sosial, buat konten yang menarik, dan gunakan strategi SEO lokal untuk menjangkau pelanggan...</p>
+                                    <a href="#" class="text-indigo-400 hover:underline mt-2 inline-block">Baca Selengkapnya</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+    <!-- Custom JavaScript File -->
+    <script src="script.js" defer></script>
+</body>
+</html>
