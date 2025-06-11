@@ -54,10 +54,12 @@ security = HTTPBearer()
 
 app = FastAPI(title="FinSight API", version="1.0.0")
 
+
+base_url = os.getenv("BASE_URL", "development")  # Untuk menentukan environment
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Sesuaikan dengan domain frontend
+    allow_origins=[base_url],  # Sesuaikan dengan domain frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
