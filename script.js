@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DATA & STATE MANAGEMENT ---
     // BASE_URL untuk API backend
-    const BASE_URL = 'http://localhost:8000'; // Sesuaikan jika API berjalan di host/port lain
+    const BASE_URL = 'finsight-production-ece5.up.railway.app'; // Sesuaikan jika API berjalan di host/port lain
     let authToken = null; // Token JWT akan disimpan di sini setelah login
     let currentUserId = null; // ID pengguna saat ini
     let currentUserName = null; // Nama pengguna saat ini
