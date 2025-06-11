@@ -1,0 +1,37 @@
+# docker-compose.yml (untuk development local)
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/finsight_db
+      - SECRET_KEY=your-super-secret-key-here
+    depends_on:
+      db:
+        condition: service_healthy # <--- CHANGE HERE
+    volumes:
+      - .:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=finsight_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./finsight_db_schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck: # <--- ADD THIS SECTION
+      test: ["CMD-SHELL", "pg_isready -U postgres -d finsight_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
