@@ -392,8 +392,8 @@ async def generate_business_recommendations(
     if request.lokasi:
         prompt_parts.append(f"- Target lokasi: {request.lokasi}")
     
-    prompt_parts.append("\nFormat jawaban dalam bentuk JSON array, di mana setiap objek memiliki kunci: 'nama' (string), 'deskripsi' (string), 'modal_dibutuhkan' (integer), 'potensi_keuntungan' (string, misal 'Rp X - Y/bulan'), dan 'tingkat_risiko' (string, 'Rendah', 'Sedang', atau 'Tinggi').")
-    prompt_parts.append("Contoh satu item JSON: {\"nama\": \"Warung Kopi Sederhana\", \"deskripsi\": \"Warung kopi dengan menu terbatas namun berkualitas\", \"modal_dibutuhkan\": 800000, \"potensi_keuntungan\": \"Rp 300k - 500k/bulan\", \"tingkat_risiko\": \"Rendah\"}")
+    prompt_parts.append("\nFormat jawaban dalam bentuk JSON object dengan kunci 'recommendations' yang berisi array, di mana setiap objek memiliki kunci: 'nama' (string), 'deskripsi' (string), 'modal_dibutuhkan' (integer), 'potensi_keuntungan' (string, misal 'Rp X - Y/bulan'), dan 'tingkat_risiko' (string, 'Rendah', 'Sedang', atau 'Tinggi').")
+    prompt_parts.append("Contoh format JSON yang diharapkan: {\"recommendations\": [{\"nama\": \"Warung Kopi Sederhana\", \"deskripsi\": \"Warung kopi dengan menu terbatas namun berkualitas\", \"modal_dibutuhkan\": 800000, \"potensi_keuntungan\": \"Rp 300k - 500k/bulan\", \"tingkat_risiko\": \"Rendah\"}]}")
 
     full_prompt = "\n".join(prompt_parts)
 
@@ -434,6 +434,8 @@ async def generate_business_recommendations(
                         parsed_content = json.loads(content_str) # Menggunakan json.loads dari modul json
                         if isinstance(parsed_content, dict) and "recommendations" in parsed_content:
                              recommendations = parsed_content["recommendations"]
+                        elif isinstance(parsed_content, dict) and "usaha" in parsed_content:
+                             recommendations = parsed_content["usaha"]
                         elif isinstance(parsed_content, list) : # Jika API langsung mengembalikan array
                             recommendations = parsed_content
                         else: # Jika format tidak sesuai, coba parsing manual sederhana atau fallback
