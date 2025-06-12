@@ -29,6 +29,7 @@ import os
 from fastapi.responses import Response
 from dotenv import load_dotenv
 import random
+import httpx # Tambahkan import ini
 
 
 # Tambahkan import ini
@@ -43,6 +44,11 @@ IS_PROD = os.getenv("ENVIRONMENT") == "production"
 # Database configuration
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/finsight_db")
 # Untuk development local bisa pakai SQLite: "sqlite:///./finsight.db"
+
+# Konfigurasi untuk API Eksternal (Contoh OpenRouter)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"# Ganti dengan URL API yang sesuai
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-3.5-turbo")  
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -375,68 +381,94 @@ async def generate_business_recommendations(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # Simulasi rekomendasi berbasis AI
-    recommendations = []
+    # Persiapkan prompt untuk API LLM
+    prompt_parts = [
+        f"Berikan 3 rekomendasi usaha UMKM berdasarkan kriteria berikut:",
+        f"- Modal tersedia: Rp {request.modal:,.0f}",
+    ]
+    if request.minat:
+        prompt_parts.append(f"- Minat bidang usaha: {request.minat}")
+    if request.lokasi:
+        prompt_parts.append(f"- Target lokasi: {request.lokasi}")
     
-    if request.modal < 1000000:  # < 1 juta
-        recommendations = [
-            {
-                "nama": "Warung Kopi Sederhana",
-                "deskripsi": "Warung kopi dengan menu terbatas namun berkualitas",
-                "modal_dibutuhkan": 800000,
-                "potensi_keuntungan": "Rp 300k - 500k/bulan",
-                "tingkat_risiko": "Rendah"
-            },
-            {
-                "nama": "Jasa Laundry Kiloan",
-                "deskripsi": "Layanan cuci pakaian dengan sistem kiloan",
-                "modal_dibutuhkan": 1200000,
-                "potensi_keuntungan": "Rp 500k - 800k/bulan",
-                "tingkat_risiko": "Rendah"
-            }
-        ]
-    elif request.modal < 5000000:  # 1-5 juta
-        recommendations = [
-            {
-                "nama": "Toko Kelontong Modern",
-                "deskripsi": "Toko kelontong dengan sistem kasir digital",
-                "modal_dibutuhkan": 3000000,
-                "potensi_keuntungan": "Rp 800k - 1.2jt/bulan",
-                "tingkat_risiko": "Sedang"
-            },
-            {
-                "nama": "Catering Rumahan",
-                "deskripsi": "Layanan catering untuk acara kecil dan kantor",
-                "modal_dibutuhkan": 2500000,
-                "potensi_keuntungan": "Rp 1jt - 2jt/bulan",
-                "tingkat_risiko": "Sedang"
-            }
-        ]
-    else:  # > 5 juta
-        recommendations = [
-            {
-                "nama": "Kedai Kopi Premium",
-                "deskripsi": "Kedai kopi dengan konsep modern dan WiFi",
-                "modal_dibutuhkan": 8000000,
-                "potensi_keuntungan": "Rp 2jt - 4jt/bulan",
-                "tingkat_risiko": "Sedang"
-            },
-            {
-                "nama": "Toko Fashion Online",
-                "deskripsi": "Toko fashion dengan fokus penjualan online",
-                "modal_dibutuhkan": 6000000,
-                "potensi_keuntungan": "Rp 1.5jt - 3jt/bulan",
-                "tingkat_risiko": "Tinggi"
-            }
-        ]
-    
-    # Simpan ke database
+    prompt_parts.append("\nFormat jawaban dalam bentuk JSON array, di mana setiap objek memiliki kunci: 'nama' (string), 'deskripsi' (string), 'modal_dibutuhkan' (integer), 'potensi_keuntungan' (string, misal 'Rp X - Y/bulan'), dan 'tingkat_risiko' (string, 'Rendah', 'Sedang', atau 'Tinggi').")
+    prompt_parts.append("Contoh satu item JSON: {\"nama\": \"Warung Kopi Sederhana\", \"deskripsi\": \"Warung kopi dengan menu terbatas namun berkualitas\", \"modal_dibutuhkan\": 800000, \"potensi_keuntungan\": \"Rp 300k - 500k/bulan\", \"tingkat_risiko\": \"Rendah\"}")
+
+    full_prompt = "\n".join(prompt_parts)
+
+    recommendations = [] # Default jika API gagal
+
+    if not OPENROUTER_API_KEY:
+        raise HTTPException(status_code=500, detail="API Key untuk layanan rekomendasi tidak dikonfigurasi.")
+
+    try:
+        async with httpx.AsyncClient() as client:
+            api_response = await client.post(
+                OPENROUTER_API_URL,
+                headers={
+                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": f"{MODEL_NAME}", # Ganti dengan model yang Anda inginkan di OpenRouter
+                    "messages": [
+                        {"role": "user", "content": full_prompt}
+                    ],
+                    "response_format": {"type": "json_object"} # Meminta output JSON jika model mendukung
+                },
+                timeout=30.0 # Timeout 30 detik
+            )
+            api_response.raise_for_status() # Akan raise error jika status code 4xx atau 5xx
+            
+            response_data = api_response.json()
+            
+            # Ekstrak konten dari respons API LLM
+            # Struktur respons OpenRouter bisa bervariasi, sesuaikan parsing di bawah ini
+            if response_data.get("choices") and len(response_data["choices"]) > 0:
+                content_str = response_data["choices"][0].get("message", {}).get("content")
+                if content_str:
+                    try:
+                        # Coba parse string konten sebagai JSON
+                        # LLM mungkin tidak selalu mengembalikan JSON yang sempurna, jadi perlu error handling
+                        parsed_content = jwt.utils.json_loads(content_str) # Menggunakan json_loads dari jose karena sudah diimpor
+                        if isinstance(parsed_content, dict) and "recommendations" in parsed_content:
+                             recommendations = parsed_content["recommendations"]
+                        elif isinstance(parsed_content, list) : # Jika API langsung mengembalikan array
+                            recommendations = parsed_content
+                        else: # Jika format tidak sesuai, coba parsing manual sederhana atau fallback
+                            print(f"Warning: Format JSON dari LLM tidak sesuai ekspektasi: {content_str}")
+                            # Fallback ke rekomendasi default jika parsing gagal total
+                            recommendations = [
+                                {"nama": "Gagal memproses rekomendasi dari AI", "deskripsi": "Silakan coba lagi atau periksa konfigurasi.", "modal_dibutuhkan": 0, "potensi_keuntungan": "-", "tingkat_risiko": "-"}
+                            ]
+                    except Exception as e:
+                        print(f"Error parsing recommendations from LLM: {e}, content: {content_str}")
+                        recommendations = [
+                             {"nama": "Error parsing rekomendasi AI", "deskripsi": str(e), "modal_dibutuhkan": 0, "potensi_keuntungan": "-", "tingkat_risiko": "-"}
+                        ]
+                else:
+                    recommendations = [{"nama": "Tidak ada konten dari AI", "deskripsi": "-", "modal_dibutuhkan": 0, "potensi_keuntungan": "-", "tingkat_risiko": "-"}]
+            else:
+                 recommendations = [{"nama": "Tidak ada respons dari AI", "deskripsi": "-", "modal_dibutuhkan": 0, "potensi_keuntungan": "-", "tingkat_risiko": "-"}]
+
+
+    except httpx.HTTPStatusError as e:
+        print(f"HTTP error occurred: {e.response.status_code} - {e.response.text}")
+        raise HTTPException(status_code=e.response.status_code, detail=f"Gagal menghubungi layanan rekomendasi: {e.response.text}")
+    except httpx.RequestError as e:
+        print(f"Request error occurred: {e}")
+        raise HTTPException(status_code=503, detail=f"Layanan rekomendasi tidak tersedia: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        raise HTTPException(status_code=500, detail=f"Terjadi kesalahan internal saat memproses rekomendasi: {str(e)}")
+
+    # Simpan ke database (opsional, tergantung apakah Anda ingin menyimpan hasil dari API eksternal)
     recommendation_record = BusinessRecommendation(
         user_id=current_user.id,
         modal=request.modal,
         minat=request.minat,
         lokasi=request.lokasi,
-        recommendations=recommendations
+        recommendations=recommendations # Simpan hasil dari API
     )
     db.add(recommendation_record)
     db.commit()
