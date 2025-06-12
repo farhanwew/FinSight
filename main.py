@@ -26,6 +26,7 @@ from datetime import datetime, date, timedelta
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 import os
+from fastapi.responses import Response
 from dotenv import load_dotenv
 import random
 
@@ -35,6 +36,9 @@ from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse # Untuk melayani index.html sebagai root
 
 load_dotenv()
+
+
+IS_PROD = os.getenv("ENVIRONMENT") == "production"
 
 # Database configuration
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/finsight_db")
@@ -52,7 +56,17 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
-app = FastAPI(title="FinSight API", version="1.0.0")
+# app = FastAPI(title="FinSight API", version="1.0.0")
+IS_PROD = os.getenv("ENV") == "production"
+
+app = FastAPI(
+    docs_url=None if IS_PROD else "/docs",
+    redoc_url=None if IS_PROD else "/redoc",
+    openapi_url=None if IS_PROD else "/openapi.json",
+    title="FinSight API",
+    version="1.0.0",
+    description="API untuk aplikasi FinSight - Manajemen Keuangan Pribadi",
+)
 
 
 base_url = os.getenv("BASE_URL", "development")  # Untuk menentukan environment
@@ -456,6 +470,15 @@ async def analyze_feasibility(
         "break_even_months": break_even_months,
         "feasibility_status": feasibility_status
     }
+    
+    
+@app.get("/config.js")
+def get_config():
+    base_url = os.getenv("BASE_URL", "http://localhost:8000")
+    return Response(
+        content=f'window.env = {{ BASE_URL: "{base_url}" }};',
+        media_type="application/javascript"
+    )   
 
 # Create tables
 Base.metadata.create_all(bind=engine)

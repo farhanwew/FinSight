@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DATA & STATE MANAGEMENT ---
     // BASE_URL untuk API backend
-    const BASE_URL = process.env.BASE_URL || "http://localhost:8000"; // Gunakan BASE_URL dari environment variable atau default ke localhost
+    const BASE_URL = window.env.BASE_URL || "http://localhost:8000"; // Gunakan BASE_URL dari environment variable atau default ke localhost
     let authToken = null; // Token JWT akan disimpan di sini setelah login
     let currentUserId = null; // ID pengguna saat ini
     let currentUserName = null; // Nama pengguna saat ini
