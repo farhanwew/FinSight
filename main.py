@@ -56,9 +56,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
-# app = FastAPI(title="FinSight API", version="1.0.0")
-IS_PROD = os.getenv("ENV") == "production"
-
 app = FastAPI(
     docs_url=None if IS_PROD else "/docs",
     redoc_url=None if IS_PROD else "/redoc",
