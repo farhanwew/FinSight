@@ -1,5 +1,5 @@
 venv/
 .env
 README.md
-__pyacache__/
+__pycache__
 
