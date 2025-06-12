@@ -30,6 +30,7 @@ from fastapi.responses import Response
 from dotenv import load_dotenv
 import random
 import httpx
+import json # Add this import
 
 
 # Tambahkan import ini
@@ -430,7 +431,7 @@ async def generate_business_recommendations(
                     try:
                         # Coba parse string konten sebagai JSON
                         # LLM mungkin tidak selalu mengembalikan JSON yang sempurna, jadi perlu error handling
-                        parsed_content = jwt.utils.json_loads(content_str) # Menggunakan json_loads dari jose karena sudah diimpor
+                        parsed_content = json.loads(content_str) # Menggunakan json.loads dari modul json
                         if isinstance(parsed_content, dict) and "recommendations" in parsed_content:
                              recommendations = parsed_content["recommendations"]
                         elif isinstance(parsed_content, list) : # Jika API langsung mengembalikan array
