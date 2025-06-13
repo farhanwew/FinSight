@@ -58,5 +58,6 @@ class CashFlowPredictionResponse(BaseModel):
 class FeasibilityAnalysisResponse(BaseModel):
     profit_bersih: float
     roi: float
-    break_even_months: Optional[float] # Changed to Optional[float]
-    feasibility_status: str
+    break_even_months: Optional[float] # Tetap Optional[float]
+    feasibility_status: str # Status numerik sederhana (Layak, Kurang Layak, Tidak Layak)
+    ai_insight: str # Insight yang lebih detail dari LLM

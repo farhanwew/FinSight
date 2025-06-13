@@ -56,12 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const feaRoiEl = document.getElementById('fea-roi');
     const feaBepEl = document.getElementById('fea-bep');
     const breakEvenChartCanvas = document.getElementById('breakEvenChart');
+    const feaAiInsightEl = document.getElementById('fea-ai-insight');
+    // Analisis Kelayakan elements
+    // ... (elemen yang sudah ada)
+    const feasibilityLoading = document.getElementById('feasibility-loading'); // <<< TAMBAHKAN INI
+    const feasibilityAiInsightEl = document.getElementById('feasibility-ai-insight'); // <<< TAMBAHKAN INI // Tambah elemen baru untuk AI Insight
 
 
     // --- DATA & STATE MANAGEMENT ---
     // BASE_URL untuk API backend
-   const BASE_URL = window.env?.BASE_URL || "http://localhost:8000"; // Gunakan BASE_URL dari environment variable atau default ke localhost
-    let authToken = null; // Token JWT akan disimpan di sini setelah login
+   const BASE_URL = window.env?.BASE_URL || "http://localhost:8000";
+    let authToken = localStorage.getItem('finsight_token'); // Ambil dari localStorage
     let currentUserId = null; // ID pengguna saat ini
     let currentUserName = null; // Nama pengguna saat ini
     let currentUserTransactions = []; // Transaksi pengguna saat ini
@@ -94,6 +99,25 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`${type.toUpperCase()}: ${message}`);
     };
 
+    // Fungsi untuk menyimpan token
+    const saveAuthToken = (token) => {
+        authToken = token;
+        localStorage.setItem('finsight_token', token);
+    };
+
+    // Fungsi untuk menghapus token
+    const clearAuthToken = () => {
+        authToken = null;
+        localStorage.removeItem('finsight_token');
+    };
+
+    // Tambahkan fungsi untuk handle unauthorized response
+const handleUnauthorized = () => {
+    clearAuthToken();
+    showMessage('Sesi berakhir. Silakan login kembali.', 'error');
+    showAuth();
+};
+
     // --- AUTHENTICATION LOGIC ---
     const showApp = async () => {
         authScreen.classList.add('hidden');
@@ -120,11 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // Token mungkin kadaluarsa atau tidak valid
                 showMessage('Sesi berakhir. Silakan login kembali.', 'error');
+                clearAuthToken(); // Hapus token yang tidak valid
                 showAuth();
             }
         } catch (error) {
             console.error('Error fetching user info:', error);
             showMessage('Gagal memuat info pengguna. Silakan coba lagi.', 'error');
+            clearAuthToken();
             showAuth();
         } finally {
              lucide.createIcons();
@@ -136,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authScreen.classList.remove('hidden');
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
-        authToken = null; // Hapus token saat logout
+        clearAuthToken(); // Hapus token saat logout
         currentUserId = null;
         currentUserName = null;
         currentUserTransactions = [];
@@ -166,6 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
+            
+            if (response.status === 401) {
+                handleUnauthorized();
+                return;
+            }
+            
             if (response.ok) {
                 currentUserTransactions = await response.json();
             } else {
@@ -384,9 +416,23 @@ document.addEventListener('DOMContentLoaded', () => {
         destroyChart('breakEvenChart');
         const ctx = breakEvenChartCanvas.getContext('2d');
 
-        const labels = Array.from({length: Math.ceil(breakEvenMonths) + 3}, (_, i) => `Bulan ${i + 1}`);
+        // Jika breakEvenMonths adalah null atau 0, kita tidak perlu menggambar grafik atau menampilkannya secara berbeda.
+        // Cek juga jika profit_bersih_per_bulan adalah 0 atau negatif, agar grafik tidak menampilkan data yang tidak masuk akal.
         const modalAwal = parseFloat(feaModalInput.value);
         const profitBersihPerBulan = parseFloat(feaPemasukanInput.value) - parseFloat(feaBiayaInput.value);
+        
+        if (breakEvenMonths === null || breakEvenMonths <= 0 || profitBersihPerBulan <= 0) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
+            ctx.textAlign = 'center';
+            ctx.fillText('Grafik tidak tersedia (defisit atau balik modal tidak tercapai).', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            return;
+        }
+
+        // Batasi jumlah bulan yang ditampilkan agar grafik tidak terlalu panjang
+        const numMonthsToShow = Math.ceil(breakEvenMonths) + 3;
+        const labels = Array.from({length: numMonthsToShow > 20 ? 20 : numMonthsToShow}, (_, i) => `Bulan ${i + 1}`); // Batasi hingga 20 bulan jika terlalu panjang
+
 
         const cumulativeProfit = labels.map((_, i) => (i + 1) * profitBersihPerBulan);
         const breakEvenLine = labels.map(() => modalAwal);
@@ -497,9 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const data = await response.json();
-                authToken = data.access_token;
+                saveAuthToken(data.access_token); // Simpan token
                 showMessage('Login berhasil!', 'success');
-                showApp(); // Lanjutkan ke aplikasi utama
+                showApp();
             } else {
                 const errorData = await response.json();
                 showMessage(errorData.detail || 'Email atau password salah. Silakan coba lagi.', 'error');
@@ -526,9 +572,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const data = await response.json();
-                authToken = data.access_token;
+                saveAuthToken(data.access_token); // Simpan token
                 showMessage('Registrasi berhasil! Anda sudah login.', 'success');
-                showApp(); // Lanjutkan ke aplikasi utama
+                showApp();
             } else {
                 const errorData = await response.json();
                 showMessage(errorData.detail || 'Registrasi gagal. Email mungkin sudah terdaftar.', 'error');
@@ -539,7 +585,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    logoutBtn.addEventListener('click', (e) => { e.preventDefault(); showAuth(); });
+    logoutBtn.addEventListener('click', (e) => { 
+        e.preventDefault(); 
+        clearAuthToken(); // Hapus token saat logout
+        showAuth(); 
+    });
     navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); switchPage(e.currentTarget.dataset.page); }); });
     
     // TRANSACTION FORM SUBMISSION
@@ -672,6 +722,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Tambahkan variabel untuk mengelola request
+    let feasibilityAbortController = null; // Untuk membatalkan request sebelumnya
+
     // --- ANALISIS KELAYAKAN USAHA LOGIC ---
     feasibilityForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -685,22 +738,39 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Batalkan request sebelumnya jika ada
+        if (feasibilityAbortController) {
+            feasibilityAbortController.abort();
+        }
+
+        // Buat controller baru untuk request ini
+        feasibilityAbortController = new AbortController();
+
+        // Tampilkan loading state
+        feasibilityResult.classList.remove('hidden');
+        feasibilityLoading.classList.remove('hidden');
+        feasibilityOutput.classList.add('hidden');
+
         try {
             const response = await fetch(`${BASE_URL}/analysis/feasibility?modal_awal=${modalAwal}&biaya_operasional=${biayaOperasional}&estimasi_pemasukan=${estimasiPemasukan}`, {
-                method: 'POST', // Menggunakan POST meskipun parameter ada di query string, sesuai API Anda
-                headers: getAuthHeaders()
+                method: 'POST',
+                headers: getAuthHeaders(),
+                signal: feasibilityAbortController.signal // Tambahkan signal untuk abort
             });
 
             if (response.ok) {
                 const data = await response.json();
-                feasibilityResult.classList.remove('hidden');
+                console.log('Feasibility Analysis Data Received:', data);
+
+                // Sembunyikan loading dan tampilkan hasil
+                feasibilityLoading.classList.add('hidden');
                 feasibilityOutput.classList.remove('hidden');
 
                 feaProfitEl.textContent = formatCurrency(data.profit_bersih);
-                feaRoiEl.textContent = `${data.roi.toFixed(2)}%`;
+                feaRoiEl.textContent = data.roi !== null && data.roi !== undefined ? `${data.roi.toFixed(2)}%` : 'N/A';
                 
                 let bepText;
-                if (data.break_even_months === Infinity) {
+                if (data.break_even_months === null || data.break_even_months === Infinity) {
                     bepText = 'Tidak tercapai (Defisit)';
                     feasibilityStatusEl.className = 'p-4 rounded-md font-bold text-center text-lg bg-red-900/50 text-red-300 border border-red-500';
                 } else {
@@ -714,18 +784,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 feaBepEl.textContent = bepText;
                 feasibilityStatusEl.textContent = `Status: ${data.feasibility_status}`;
                 
+                // Update AI insight ke DOM
+                if (feasibilityAiInsightEl && data.ai_insight) {
+                    feasibilityAiInsightEl.textContent = data.ai_insight;
+                }
+                
                 renderBreakEvenChart(data.break_even_months);
 
             } else {
                 const errorData = await response.json();
+                console.error('Feasibility Analysis API Error:', errorData);
                 showMessage(errorData.detail || 'Gagal melakukan analisis kelayakan.', 'error');
                 feasibilityResult.classList.add('hidden');
             }
         } catch (error) {
-            console.error('Error during feasibility analysis:', error);
+            // Jangan tampilkan error jika request dibatalkan
+            if (error.name === 'AbortError') {
+                console.log('Feasibility request was aborted');
+                return;
+            }
+            
+            console.error('Error during feasibility analysis (Network/Parsing):', error);
             showMessage('Terjadi kesalahan saat analisis kelayakan.', 'error');
             feasibilityResult.classList.add('hidden');
+        } finally {
+            // Reset abort controller
+            feasibilityAbortController = null;
         }
+        
         lucide.createIcons();
     });
 
@@ -734,14 +820,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Atur tanggal transaksi default ke hari ini
     document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
 
-    // Coba autologin jika token sudah ada (misalnya dari localStorage)
-    // Untuk demo ini, kita tidak menggunakan localStorage, jadi akan selalu mulai dari auth screen.
-    // Jika Anda ingin mengimplementasikan remember me, Anda bisa menyimpan authToken di localStorage
-    // const storedToken = localStorage.getItem('finsight_token');
-    // if (storedToken) {
-    //     authToken = storedToken;
-    //     showApp();
-    // } else {
+    // Auto-login jika token sudah ada
+    if (authToken && authToken.trim() !== '') {
+        console.log('Token found in localStorage, attempting auto-login...');
+        showApp();
+    } else {
+        console.log('No valid token found, showing auth screen...');
         showAuth();
-    // }
+    }
 });
