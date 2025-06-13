@@ -411,7 +411,7 @@ async def generate_business_recommendations(
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": f"{MODEL_NAME}", # Ganti dengan model yang Anda inginkan di OpenRouter
+                    "model": f"{MODEL_NAME}", 
                     "messages": [
                         {"role": "user", "content": full_prompt}
                     ],
