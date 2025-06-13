@@ -1,3 +1,40 @@
+# version: '3.8'
+
+# services:
+#   web:
+#     build: .
+#     ports:
+#       - "8000:8000"
+#     env_file:
+#       - .env    # ← ini akan baca semua isi file .env
+#     depends_on:
+#       db:
+#         condition: service_healthy
+#     volumes:
+#       - .:/app
+#     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+#   db:
+#     image: postgres:15
+#     environment:
+#       - POSTGRES_DB=finsight_db
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=password
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#       - ./finsight_db_schema.sql:/docker-entrypoint-initdb.d/init.sql
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U postgres -d finsight_db"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+
+# volumes:
+#   postgres_data:
+
+
 version: '3.8'
 
 services:
@@ -6,13 +43,13 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env    # ← ini akan baca semua isi file .env
+      - .env
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - .:/app
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload # <--- PERUBAHAN DI SINI
 
   db:
     image: postgres:15
