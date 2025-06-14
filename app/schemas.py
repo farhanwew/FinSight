@@ -61,3 +61,16 @@ class FeasibilityAnalysisResponse(BaseModel):
     break_even_months: Optional[float] # Tetap Optional[float]
     feasibility_status: str # Status numerik sederhana (Layak, Kurang Layak, Tidak Layak)
     ai_insight: str # Insight yang lebih detail dari LLM
+
+# Add these new schemas
+class UserUpdateProfile(BaseModel):
+    name: str
+
+class UserChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+
+class UserProfileResponse(BaseModel):
+    id: int
+    name: str
+    email: str

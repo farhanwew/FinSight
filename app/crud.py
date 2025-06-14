@@ -89,3 +89,24 @@ def create_business_recommendation(db: Session, user_id: int, modal: float, mina
     db.commit()
     db.refresh(recommendation_record)
     return recommendation_record
+
+# Add these new functions
+def update_user_profile(db: Session, user_id: int, name: str):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        user.name = name
+        user.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(user)
+        return user
+    return None
+
+def change_user_password(db: Session, user_id: int, new_password: str):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        user.password_hash = get_password_hash(new_password)
+        user.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(user)
+        return user
+    return None

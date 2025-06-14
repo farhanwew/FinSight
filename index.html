@@ -110,14 +110,29 @@
                      <h2 class="text-3xl font-bold" id="page-title">Dashboard</h2>
                      <div class="flex items-center space-x-4">
                          <i data-lucide="bell" class="text-slate-400 hover:text-white cursor-pointer"></i>
-                         <div class="flex items-center space-x-2">
-                             <img id="user-avatar-display" src="https://placehold.co/40x40/6366f1/ffffff?text=U" class="rounded-full" alt="User Avatar">
-                             <div>
-                                <p id="user-name-display" class="font-semibold">Jolly Watson</p>
+                         <div class="flex items-center space-x-2 cursor-pointer" id="user-profile-trigger">
+                            <img id="user-avatar-display" src="https://placehold.co/40x40/6366f1/ffffff?text=U" class="rounded-full" alt="User Avatar">
+                            <div>
+                                <p id="user-name-display" class="font-semibold">Loading...</p>
                                 <p class="text-xs text-slate-400">UMKM</p>
-                             </div>
-                         </div>
+                            </div>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                        </div>
                      </div>
+                </div>
+
+                <!-- Profile Dropdown Menu (add this right after the user profile div) -->
+                <div id="profile-dropdown" class="absolute right-8 top-16 bg-slate-800 border border-slate-600 rounded-lg shadow-lg z-50 w-48 hidden">
+                    <div class="p-2">
+                        <button id="profile-menu-btn" class="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded flex items-center space-x-2">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            <span>Profil Saya</span>
+                        </button>
+                        <button id="logout-dropdown-btn" class="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-slate-700 rounded flex items-center space-x-2">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Page Content Container -->
@@ -371,6 +386,69 @@
                                     <h3 class="font-bold text-lg">Tips Pemasaran Digital dengan Budget Terbatas</h3>
                                     <p class="text-slate-400 mt-1">Manfaatkan media sosial, buat konten yang menarik, dan gunakan strategi SEO lokal untuk menjangkau pelanggan...</p>
                                     <a href="#" class="text-indigo-400 hover:underline mt-2 inline-block">Baca Selengkapnya</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Page (add this with other pages) -->
+                    <div id="page-profile" class="page-content hidden">
+                        <div class="max-w-2xl mx-auto">
+                            <div class="bg-slate-800 p-8 rounded-lg shadow-lg">
+                                <div class="flex items-center justify-center mb-6">
+                                    <div class="relative">
+                                        <img id="profile-avatar" src="https://placehold.co/80x80/6366f1/ffffff?text=U" class="rounded-full w-20 h-20" alt="Profile Avatar">
+                                    </div>
+                                </div>
+                                
+                                <h3 class="text-2xl font-bold text-center mb-8">Profil Saya</h3>
+                                
+                                <!-- Update Name Form -->
+                                <div class="bg-slate-700 p-6 rounded-lg mb-6">
+                                    <h4 class="font-semibold text-lg mb-4 flex items-center">
+                                        <i data-lucide="user" class="w-5 h-5 mr-2 text-indigo-400"></i>
+                                        Update Nama
+                                    </h4>
+                                    <form id="update-name-form" class="space-y-4">
+                                        <div>
+                                            <label for="current-name" class="block text-sm font-medium text-slate-300">Nama Saat Ini</label>
+                                            <input type="text" id="current-name" readonly class="w-full bg-slate-600 border border-slate-500 rounded-md p-3 mt-1 text-slate-400">
+                                        </div>
+                                        <div>
+                                            <label for="new-name" class="block text-sm font-medium text-slate-300">Nama Baru</label>
+                                            <input type="text" id="new-name" required class="w-full bg-slate-600 border border-slate-500 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan nama baru">
+                                        </div>
+                                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors duration-200">
+                                            <i data-lucide="save" class="inline-block w-4 h-4 mr-2"></i>
+                                            Update Nama
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <!-- Change Password Form -->
+                                <div class="bg-slate-700 p-6 rounded-lg">
+                                    <h4 class="font-semibold text-lg mb-4 flex items-center">
+                                        <i data-lucide="lock" class="w-5 h-5 mr-2 text-indigo-400"></i>
+                                        Ganti Password
+                                    </h4>
+                                    <form id="change-password-form" class="space-y-4">
+                                        <div>
+                                            <label for="current-password" class="block text-sm font-medium text-slate-300">Password Saat Ini</label>
+                                            <input type="password" id="current-password" required class="w-full bg-slate-600 border border-slate-500 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan password saat ini">
+                                        </div>
+                                        <div>
+                                            <label for="new-password" class="block text-sm font-medium text-slate-300">Password Baru</label>
+                                            <input type="password" id="new-password" required class="w-full bg-slate-600 border border-slate-500 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan password baru">
+                                        </div>
+                                        <div>
+                                            <label for="confirm-password" class="block text-sm font-medium text-slate-300">Konfirmasi Password Baru</label>
+                                            <input type="password" id="confirm-password" required class="w-full bg-slate-600 border border-slate-500 rounded-md p-3 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Konfirmasi password baru">
+                                        </div>
+                                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-md transition-colors duration-200">
+                                            <i data-lucide="key" class="inline-block w-4 h-4 mr-2"></i>
+                                            Ganti Password
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

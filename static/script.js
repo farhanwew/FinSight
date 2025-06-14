@@ -63,6 +63,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const feasibilityAiInsightEl = document.getElementById('feasibility-ai-insight'); // <<< TAMBAHKAN INI // Tambah elemen baru untuk AI Insight
 
 
+    // Add these elements to DOM ELEMENTS CACHING section
+const userProfileTrigger = document.getElementById('user-profile-trigger');
+const profileDropdown = document.getElementById('profile-dropdown');
+const profileMenuBtn = document.getElementById('profile-menu-btn');
+const logoutDropdownBtn = document.getElementById('logout-dropdown-btn');
+
+const updateNameForm = document.getElementById('update-name-form');
+const changePasswordForm = document.getElementById('change-password-form');
+const currentNameInput = document.getElementById('current-name');
+const newNameInput = document.getElementById('new-name');
+const profileAvatar = document.getElementById('profile-avatar');
+
+
     // --- DATA & STATE MANAGEMENT ---
     // BASE_URL untuk API backend
    const BASE_URL = window.env?.BASE_URL || "http://localhost:8000";
@@ -828,4 +841,160 @@ const handleUnauthorized = () => {
         console.log('No valid token found, showing auth screen...');
         showAuth();
     }
+
+    // Add these functions after existing utility functions
+const showProfilePage = () => {
+    switchPage('profile');
+    // Update current name in the form
+    currentNameInput.value = currentUserName || '';
+    // Update profile avatar
+    if (currentUserName) {
+        const initial = currentUserName.charAt(0).toUpperCase();
+        profileAvatar.src = `https://placehold.co/80x80/6366f1/ffffff?text=${initial}`;
+    }
+    hideProfileDropdown();
+};
+
+const showProfileDropdown = () => {
+    profileDropdown.classList.remove('hidden');
+};
+
+const hideProfileDropdown = () => {
+    profileDropdown.classList.add('hidden');
+};
+
+const updateUserProfile = async (name) => {
+    try {
+        const response = await fetch(`${BASE_URL}/auth/update-profile`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ name })
+        });
+
+        if (response.ok) {
+            const userData = await response.json();
+            currentUserName = userData.name;
+            userNameDisplay.textContent = currentUserName;
+            const initial = currentUserName.charAt(0).toUpperCase();
+            userAvatarDisplay.src = `https://placehold.co/40x40/6366f1/ffffff?text=${initial}`;
+            profileAvatar.src = `https://placehold.co/80x80/6366f1/ffffff?text=${initial}`;
+            currentNameInput.value = currentUserName;
+            showMessage('Nama berhasil diperbarui!', 'success');
+            return true;
+        } else {
+            const errorData = await response.json();
+            showMessage(errorData.detail || 'Gagal memperbarui nama.', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        showMessage('Terjadi kesalahan saat memperbarui nama.', 'error');
+        return false;
+    }
+};
+
+const changeUserPassword = async (currentPassword, newPassword) => {
+    try {
+        const response = await fetch(`${BASE_URL}/auth/change-password`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ 
+                current_password: currentPassword, 
+                new_password: newPassword 
+            })
+        });
+
+        if (response.ok) {
+            showMessage('Password berhasil diubah!', 'success');
+            return true;
+        } else {
+            const errorData = await response.json();
+            showMessage(errorData.detail || 'Gagal mengubah password.', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        showMessage('Terjadi kesalahan saat mengubah password.', 'error');
+        return false;
+    }
+};
+
+// Profile dropdown toggle
+userProfileTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (profileDropdown.classList.contains('hidden')) {
+        showProfileDropdown();
+    } else {
+        hideProfileDropdown();
+    }
+});
+
+// Hide dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    if (!userProfileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+        hideProfileDropdown();
+    }
+});
+
+// Profile menu button
+profileMenuBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    showProfilePage();
+});
+
+// Logout from dropdown
+logoutDropdownBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    clearAuthToken();
+    showAuth();
+});
+
+// Update name form
+updateNameForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const newName = newNameInput.value.trim();
+    
+    if (!newName) {
+        showMessage('Nama tidak boleh kosong.', 'warning');
+        return;
+    }
+    
+    if (newName === currentUserName) {
+        showMessage('Nama baru sama dengan nama saat ini.', 'warning');
+        return;
+    }
+    
+    const success = await updateUserProfile(newName);
+    if (success) {
+        newNameInput.value = '';
+    }
+});
+
+// Change password form
+changePasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showMessage('Semua field password harus diisi.', 'warning');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        showMessage('Konfirmasi password tidak cocok.', 'warning');
+        return;
+    }
+    
+    if (newPassword.length < 6) {
+        showMessage('Password baru minimal 6 karakter.', 'warning');
+        return;
+    }
+    
+    const success = await changeUserPassword(currentPassword, newPassword);
+    if (success) {
+        changePasswordForm.reset();
+    }
+});
 });

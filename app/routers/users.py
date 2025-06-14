@@ -42,3 +42,40 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
         "name": current_user.name,
         "email": current_user.email
     }
+
+# Add these new endpoints
+@router.put("/update-profile", response_model=schemas.UserProfileResponse)
+async def update_profile(
+    profile_data: schemas.UserUpdateProfile,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    updated_user = crud.update_user_profile(db, current_user.id, profile_data.name)
+    if not updated_user:
+        raise HTTPException(status_code=400, detail="Failed to update profile")
+    
+    return {
+        "id": updated_user.id,
+        "name": updated_user.name,
+        "email": updated_user.email
+    }
+
+@router.put("/change-password")
+async def change_password(
+    password_data: schemas.UserChangePassword,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    # Verify current password
+    if not crud.verify_password(password_data.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Update password
+    updated_user = crud.change_user_password(db, current_user.id, password_data.new_password)
+    if not updated_user:
+        raise HTTPException(status_code=400, detail="Failed to change password")
+    
+    return {"message": "Password changed successfully"}
