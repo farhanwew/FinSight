@@ -1060,7 +1060,7 @@
                     
                     ${post.image_url ? `
                         <div class="mb-6">
-                                <img src="${post.image_url}" class="max-w-full w-full h-auto object-cover rounded-lg border border-slate-600 mx-auto" alt="Post image">
+                            <img src="${post.image_url}" class="max-w-lg w-full h-auto object-cover rounded-lg border border-slate-600 mx-auto" alt="Post image">
                         </div>
                     ` : ''}
                     
