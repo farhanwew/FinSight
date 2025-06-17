@@ -77,6 +77,10 @@ const profileAvatar = document.getElementById('profile-avatar');
 const communityPostForm = document.getElementById('community-post-form');
 const communityPostsContainer = document.getElementById('community-posts-container');
 const filterButtons = document.querySelectorAll('.filter-btn');
+const createPostBtn = document.getElementById('create-post-btn');
+const createPostModal = document.getElementById('create-post-modal');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const cancelPostBtn = document.getElementById('cancel-post-btn');
 
 
     // --- DATA & STATE MANAGEMENT ---
@@ -1039,7 +1043,7 @@ const renderCommunityPosts = (posts) => {
         const categoryColor = getCategoryColor(post.category);
         
         return `
-            <div class="bg-slate-800 p-6 rounded-lg shadow-lg post-card" data-post-id="${post.id}">
+            <div class="bg-slate-800 p-6 rounded-lg shadow-lg post-card mb-6" data-post-id="${post.id}">
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex items-center space-x-3">
                         <img src="https://placehold.co/40x40/6366f1/ffffff?text=${post.owner.name.charAt(0).toUpperCase()}" class="rounded-full" alt="${post.owner.name}">
@@ -1060,15 +1064,11 @@ const renderCommunityPosts = (posts) => {
                     <div class="flex items-center space-x-4">
                         <button class="like-btn flex items-center space-x-1 text-slate-400 hover:text-red-400 transition-colors" data-post-id="${post.id}">
                             <i data-lucide="heart" class="w-4 h-4"></i>
-                            <span>${post.likes_count}</span>
+                            <span class="like-count">${post.likes_count}</span>
                         </button>
                         <button class="comment-btn flex items-center space-x-1 text-slate-400 hover:text-indigo-400 transition-colors" data-post-id="${post.id}">
                             <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            <span>${post.comments_count}</span>
-                        </button>
-                        <button class="share-btn flex items-center space-x-1 text-slate-400 hover:text-green-400 transition-colors">
-                            <i data-lucide="share" class="w-4 h-4"></i>
-                            <span>Bagikan</span>
+                            <span class="comment-count">${post.comments_count}</span>
                         </button>
                     </div>
                 </div>
@@ -1077,7 +1077,7 @@ const renderCommunityPosts = (posts) => {
                 <div class="comments-section hidden mt-4 pt-4 border-t border-slate-700">
                     <div class="comments-list mb-4"></div>
                     <div class="flex space-x-2">
-                        <input type="text" class="comment-input flex-1 bg-slate-700 border border-slate-600 rounded-md p-2 text-sm" placeholder="Tulis komentar...">
+                        <input type="text" class="comment-input flex-1 bg-slate-700 border border-slate-600 rounded-md p-2 text-sm" placeholder="Tulis komentar..." data-post-id="${post.id}">
                         <button class="submit-comment-btn bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-md text-sm" data-post-id="${post.id}">
                             <i data-lucide="send" class="w-4 h-4"></i>
                         </button>
@@ -1125,6 +1125,29 @@ const getTimeAgo = (date) => {
     return 'Baru saja';
 };
 
+// Modal Event Listeners
+createPostBtn.addEventListener('click', () => {
+    createPostModal.classList.remove('hidden');
+});
+
+closeModalBtn.addEventListener('click', () => {
+    createPostModal.classList.add('hidden');
+    communityPostForm.reset();
+});
+
+cancelPostBtn.addEventListener('click', () => {
+    createPostModal.classList.add('hidden');
+    communityPostForm.reset();
+});
+
+// Close modal when clicking outside
+createPostModal.addEventListener('click', (e) => {
+    if (e.target === createPostModal) {
+        createPostModal.classList.add('hidden');
+        communityPostForm.reset();
+    }
+});
+
 // Event Listeners for Community
 communityPostForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1151,6 +1174,7 @@ communityPostForm.addEventListener('submit', async (e) => {
         if (response.ok) {
             showMessage('Post berhasil dibagikan!', 'success');
             communityPostForm.reset();
+            createPostModal.classList.add('hidden');
             loadCommunityPosts(); // Reload posts
         } else {
             const errorData = await response.json();
@@ -1180,9 +1204,14 @@ filterButtons.forEach(btn => {
 
 // Post interactions
 communityPostsContainer.addEventListener('click', async (e) => {
-    const postId = e.target.closest('[data-post-id]')?.dataset.postId;
+    const postCard = e.target.closest('.post-card');
+    if (!postCard) return;
     
+    const postId = postCard.dataset.postId;
+    
+    // Handle like button
     if (e.target.closest('.like-btn')) {
+        e.preventDefault();
         try {
             const response = await fetch(`${BASE_URL}/community/posts/${postId}/like`, {
                 method: 'POST',
@@ -1193,28 +1222,88 @@ communityPostsContainer.addEventListener('click', async (e) => {
                 const data = await response.json();
                 const likeBtn = e.target.closest('.like-btn');
                 const heartIcon = likeBtn.querySelector('i');
-                const countSpan = likeBtn.querySelector('span');
+                const countSpan = likeBtn.querySelector('.like-count');
                 
                 if (data.liked) {
                     heartIcon.classList.add('fill-current', 'text-red-400');
+                    likeBtn.classList.remove('text-slate-400');
+                    likeBtn.classList.add('text-red-400');
                     countSpan.textContent = parseInt(countSpan.textContent) + 1;
                 } else {
                     heartIcon.classList.remove('fill-current', 'text-red-400');
+                    likeBtn.classList.remove('text-red-400');
+                    likeBtn.classList.add('text-slate-400');
                     countSpan.textContent = parseInt(countSpan.textContent) - 1;
                 }
+            } else {
+                showMessage('Gagal memberikan like.', 'error');
             }
         } catch (error) {
             console.error('Error toggling like:', error);
+            showMessage('Terjadi kesalahan saat memberikan like.', 'error');
         }
     }
     
+    // Handle comment button
     if (e.target.closest('.comment-btn')) {
-        const commentsSection = e.target.closest('.post-card').querySelector('.comments-section');
+        e.preventDefault();
+        const commentsSection = postCard.querySelector('.comments-section');
         commentsSection.classList.toggle('hidden');
         
         if (!commentsSection.classList.contains('hidden')) {
             loadComments(postId, commentsSection.querySelector('.comments-list'));
         }
+    }
+    
+    // Handle submit comment button
+    if (e.target.closest('.submit-comment-btn')) {
+        e.preventDefault();
+        const commentInput = postCard.querySelector('.comment-input');
+        const content = commentInput.value.trim();
+        
+        if (!content) {
+            showMessage('Komentar tidak boleh kosong.', 'error');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${BASE_URL}/community/posts/${postId}/comments`, {
+                method: 'POST',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content })
+            });
+            
+            if (response.ok) {
+                commentInput.value = '';
+                const commentsSection = postCard.querySelector('.comments-section');
+                loadComments(postId, commentsSection.querySelector('.comments-list'));
+                
+                // Update comment count
+                const commentCountSpan = postCard.querySelector('.comment-count');
+                commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
+                
+                showMessage('Komentar berhasil ditambahkan!', 'success');
+            } else {
+                const errorData = await response.json();
+                showMessage(errorData.detail || 'Gagal menambahkan komentar.', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding comment:', error);
+            showMessage('Terjadi kesalahan saat menambahkan komentar.', 'error');
+        }
+    }
+});
+
+// Handle enter key in comment input
+communityPostsContainer.addEventListener('keypress', (e) => {
+    if (e.target.classList.contains('comment-input') && e.key === 'Enter') {
+        e.preventDefault();
+        const postCard = e.target.closest('.post-card');
+        const submitBtn = postCard.querySelector('.submit-comment-btn');
+        submitBtn.click();
     }
 });
 
@@ -1228,9 +1317,12 @@ const loadComments = async (postId, container) => {
         if (response.ok) {
             const comments = await response.json();
             renderComments(comments, container);
+        } else {
+            container.innerHTML = '<p class="text-slate-400 text-sm">Gagal memuat komentar.</p>';
         }
     } catch (error) {
         console.error('Error loading comments:', error);
+        container.innerHTML = '<p class="text-slate-400 text-sm">Terjadi kesalahan saat memuat komentar.</p>';
     }
 };
 
@@ -1260,12 +1352,21 @@ const renderComments = (comments, container) => {
 };
 
 // Update the switchPage function to load community posts when switching to community page
-const originalSwitchPage = switchPage;
-switchPage = (pageId) => {
-    originalSwitchPage(pageId);
-    
-    if (pageId === 'komunitas') {
-        loadCommunityPosts();
-    }
-};
+if (typeof switchPage !== 'undefined') {
+    const originalSwitchPage = switchPage;
+    switchPage = (pageId) => {
+        originalSwitchPage(pageId);
+        
+        if (pageId === 'komunitas') {
+            loadCommunityPosts();
+        }
+    };
+} else {
+    // If switchPage doesn't exist yet, create a placeholder
+    let switchPage = (pageId) => {
+        if (pageId === 'komunitas') {
+            loadCommunityPosts();
+        }
+    };
+}
 });

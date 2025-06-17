@@ -75,14 +75,14 @@ async def get_posts(
     skip: int = 0,
     limit: int = 20,
     category: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # Add authentication
 ):
     posts = crud.get_community_posts(db, skip, limit, category)
     
     result = []
     for post in posts:
-        owner = crud.get_user_by_email(db, "")  # We need to get user by ID
-        # Get user by ID instead
+        # Get user by ID
         user = db.query(User).filter(User.id == post.user_id).first()
         
         result.append({
@@ -113,7 +113,7 @@ async def toggle_like(
         raise HTTPException(status_code=404, detail="Post not found")
     
     is_liked = crud.like_post(db, post_id, current_user.id)
-    return {"liked": is_liked}
+    return {"liked": is_liked, "post_id": post_id}
 
 @router.post("/posts/{post_id}/comments", response_model=schemas.CommunityCommentResponse)
 async def create_comment(
@@ -141,7 +141,8 @@ async def create_comment(
 @router.get("/posts/{post_id}/comments", response_model=List[schemas.CommunityCommentResponse])
 async def get_comments(
     post_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # Add authentication
 ):
     comments = crud.get_post_comments(db, post_id)
     

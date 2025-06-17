@@ -1,10 +1,12 @@
 # app/crud.py
 from sqlalchemy.orm import Session
-from app.models import User, Transaction, CashFlowPrediction, BusinessRecommendation, CommunityPost, CommunityComment, CommunityLike
-from app.schemas import UserCreate, TransactionCreate, CommunityPostCreate, CommunityCommentCreate
+from sqlalchemy import and_
 from passlib.context import CryptContext
 from datetime import datetime, date, timedelta
-from typing import Optional # <--- ADD THIS IMPORT
+from typing import Optional
+
+from app.models import User, Transaction, CashFlowPrediction, BusinessRecommendation, CommunityPost, CommunityComment, CommunityLike
+from app.schemas import UserCreate, TransactionCreate, CommunityPostCreate, CommunityCommentCreate
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -132,30 +134,37 @@ def get_community_posts(db: Session, skip: int = 0, limit: int = 20, category: O
     return query.order_by(CommunityPost.created_at.desc()).offset(skip).limit(limit).all()
 
 def get_community_post(db: Session, post_id: int):
-    return db.query(CommunityPost).filter(CommunityPost.id == post_id, CommunityPost.is_active == True).first()
+    return db.query(CommunityPost).filter(
+        and_(CommunityPost.id == post_id, CommunityPost.is_active == True)
+    ).first()
 
 def like_post(db: Session, post_id: int, user_id: int):
     # Check if already liked
     existing_like = db.query(CommunityLike).filter(
-        CommunityLike.post_id == post_id,
-        CommunityLike.user_id == user_id
+        and_(CommunityLike.post_id == post_id, CommunityLike.user_id == user_id)
     ).first()
     
     if existing_like:
-        # Unlike
+        # Unlike - remove the like
         db.delete(existing_like)
-        db.query(CommunityPost).filter(CommunityPost.id == post_id).update({
-            CommunityPost.likes_count: CommunityPost.likes_count - 1
-        })
+        
+        # Decrease like count
+        post = db.query(CommunityPost).filter(CommunityPost.id == post_id).first()
+        if post:
+            post.likes_count = max(0, post.likes_count - 1)
+        
         db.commit()
         return False
     else:
-        # Like
+        # Like - add new like
         new_like = CommunityLike(post_id=post_id, user_id=user_id)
         db.add(new_like)
-        db.query(CommunityPost).filter(CommunityPost.id == post_id).update({
-            CommunityPost.likes_count: CommunityPost.likes_count + 1
-        })
+        
+        # Increase like count
+        post = db.query(CommunityPost).filter(CommunityPost.id == post_id).first()
+        if post:
+            post.likes_count = post.likes_count + 1
+        
         db.commit()
         return True
 
@@ -166,13 +175,17 @@ def create_comment(db: Session, comment: CommunityCommentCreate, post_id: int, u
         content=comment.content
     )
     db.add(db_comment)
+    
     # Update comment count
-    db.query(CommunityPost).filter(CommunityPost.id == post_id).update({
-        CommunityPost.comments_count: CommunityPost.comments_count + 1
-    })
+    post = db.query(CommunityPost).filter(CommunityPost.id == post_id).first()
+    if post:
+        post.comments_count = post.comments_count + 1
+    
     db.commit()
     db.refresh(db_comment)
     return db_comment
 
 def get_post_comments(db: Session, post_id: int):
-    return db.query(CommunityComment).filter(CommunityComment.post_id == post_id).order_by(CommunityComment.created_at.asc()).all()
+    return db.query(CommunityComment).filter(
+        CommunityComment.post_id == post_id
+    ).order_by(CommunityComment.created_at.asc()).all()
