@@ -94,6 +94,8 @@
                         <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="rekomendasi"><i data-lucide="lightbulb"></i><span>Rekomendasi Usaha</span></a></li>
                         <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="analisis"><i data-lucide="ruler"></i><span>Analisis Kelayakan</span></a></li>
                         <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="tips"><i data-lucide="newspaper"></i><span>Tips & Insight</span></a></li>
+                        <!-- Add this to the navigation in the sidebar -->
+                        <li><a href="#" class="nav-link flex items-center space-x-3 p-2 rounded-md hover:bg-indigo-600 transition-colors duration-200" data-page="komunitas"><i data-lucide="users"></i><span>Komunitas FinSight</span></a></li>
                     </ul>
                 </div>
                 <div>
@@ -449,6 +451,65 @@
                                             Ganti Password
                                         </button>
                                     </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Komunitas FinSight Page -->
+                    <div id="page-komunitas" class="page-content hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Create Post Form -->
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-xl font-bold mb-4">Bagikan Pencapaian Anda</h3>
+                                <form id="community-post-form" class="space-y-4" enctype="multipart/form-data">
+                                    <div>
+                                        <label for="post-title" class="block text-sm font-medium text-slate-300">Judul</label>
+                                        <input type="text" id="post-title" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: Berhasil meningkatkan omzet 50%!">
+                                    </div>
+                                    <div>
+                                        <label for="post-category" class="block text-sm font-medium text-slate-300">Kategori</label>
+                                        <select id="post-category" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500">
+                                            <option value="achievement">Pencapaian</option>
+                                            <option value="tips">Tips & Trik</option>
+                                            <option value="question">Pertanyaan</option>
+                                            <option value="story">Cerita Bisnis</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="post-content" class="block text-sm font-medium text-slate-300">Konten</label>
+                                        <textarea id="post-content" rows="4" required class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ceritakan pencapaian atau tips Anda..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label for="post-image" class="block text-sm font-medium text-slate-300">Foto (Opsional)</label>
+                                        <input type="file" id="post-image" accept="image/*" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <p class="text-xs text-slate-400 mt-1">Maksimal 5MB, format: JPG, PNG, GIF</p>
+                                    </div>
+                                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200">
+                                        <i data-lucide="send" class="inline-block w-4 h-4 mr-2"></i>
+                                        Bagikan Post
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Posts Feed -->
+                            <div class="lg:col-span-2 space-y-6">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-xl font-bold">Feed Komunitas</h3>
+                                    <div class="flex space-x-2">
+                                        <button class="filter-btn bg-indigo-600 text-white px-3 py-1 rounded text-sm" data-category="">Semua</button>
+                                        <button class="filter-btn bg-slate-700 text-slate-300 px-3 py-1 rounded text-sm hover:bg-slate-600" data-category="achievement">Pencapaian</button>
+                                        <button class="filter-btn bg-slate-700 text-slate-300 px-3 py-1 rounded text-sm hover:bg-slate-600" data-category="tips">Tips</button>
+                                        <button class="filter-btn bg-slate-700 text-slate-300 px-3 py-1 rounded text-sm hover:bg-slate-600" data-category="question">Pertanyaan</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="community-posts-container">
+                                    <!-- Posts will be loaded here -->
+                                    <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center">
+                                        <i data-lucide="loader-2" class="animate-spin mx-auto mb-2"></i>
+                                        <p class="text-slate-400">Memuat post komunitas...</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -74,6 +74,9 @@ const changePasswordForm = document.getElementById('change-password-form');
 const currentNameInput = document.getElementById('current-name');
 const newNameInput = document.getElementById('new-name');
 const profileAvatar = document.getElementById('profile-avatar');
+const communityPostForm = document.getElementById('community-post-form');
+const communityPostsContainer = document.getElementById('community-posts-container');
+const filterButtons = document.querySelectorAll('.filter-btn');
 
 
     // --- DATA & STATE MANAGEMENT ---
@@ -997,4 +1000,272 @@ changePasswordForm.addEventListener('submit', async (e) => {
         changePasswordForm.reset();
     }
 });
+
+// --- COMMUNITY LOGIC ---
+const loadCommunityPosts = async (category = '') => {
+    try {
+        const url = category ? `${BASE_URL}/community/posts?category=${category}` : `${BASE_URL}/community/posts`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (response.ok) {
+            const posts = await response.json();
+            renderCommunityPosts(posts);
+        } else {
+            showMessage('Gagal memuat post komunitas.', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading community posts:', error);
+        showMessage('Terjadi kesalahan saat memuat post komunitas.', 'error');
+    }
+};
+
+const renderCommunityPosts = (posts) => {
+    if (!posts || posts.length === 0) {
+        communityPostsContainer.innerHTML = `
+            <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center">
+                <i data-lucide="message-circle" class="mx-auto mb-2 text-slate-400"></i>
+                <p class="text-slate-400">Belum ada post di kategori ini. Jadilah yang pertama untuk berbagi!</p>
+            </div>
+        `;
+        lucide.createIcons();
+        return;
+    }
+
+    const postsHTML = posts.map(post => {
+        const timeAgo = getTimeAgo(new Date(post.created_at));
+        const categoryColor = getCategoryColor(post.category);
+        
+        return `
+            <div class="bg-slate-800 p-6 rounded-lg shadow-lg post-card" data-post-id="${post.id}">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://placehold.co/40x40/6366f1/ffffff?text=${post.owner.name.charAt(0).toUpperCase()}" class="rounded-full" alt="${post.owner.name}">
+                        <div>
+                            <p class="font-semibold">${post.owner.name}</p>
+                            <p class="text-xs text-slate-400">${timeAgo}</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 text-xs rounded-full ${categoryColor}">${getCategoryLabel(post.category)}</span>
+                </div>
+                
+                <h4 class="font-bold text-lg mb-2">${post.title}</h4>
+                <p class="text-slate-300 mb-4">${post.content}</p>
+                
+                ${post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-lg mb-4" alt="Post image">` : ''}
+                
+                <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                    <div class="flex items-center space-x-4">
+                        <button class="like-btn flex items-center space-x-1 text-slate-400 hover:text-red-400 transition-colors" data-post-id="${post.id}">
+                            <i data-lucide="heart" class="w-4 h-4"></i>
+                            <span>${post.likes_count}</span>
+                        </button>
+                        <button class="comment-btn flex items-center space-x-1 text-slate-400 hover:text-indigo-400 transition-colors" data-post-id="${post.id}">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            <span>${post.comments_count}</span>
+                        </button>
+                        <button class="share-btn flex items-center space-x-1 text-slate-400 hover:text-green-400 transition-colors">
+                            <i data-lucide="share" class="w-4 h-4"></i>
+                            <span>Bagikan</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Comments section (initially hidden) -->
+                <div class="comments-section hidden mt-4 pt-4 border-t border-slate-700">
+                    <div class="comments-list mb-4"></div>
+                    <div class="flex space-x-2">
+                        <input type="text" class="comment-input flex-1 bg-slate-700 border border-slate-600 rounded-md p-2 text-sm" placeholder="Tulis komentar...">
+                        <button class="submit-comment-btn bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-md text-sm" data-post-id="${post.id}">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    communityPostsContainer.innerHTML = postsHTML;
+    lucide.createIcons();
+};
+
+const getCategoryColor = (category) => {
+    const colors = {
+        achievement: 'bg-green-900/50 text-green-300',
+        tips: 'bg-blue-900/50 text-blue-300',
+        question: 'bg-yellow-900/50 text-yellow-300',
+        story: 'bg-purple-900/50 text-purple-300'
+    };
+    return colors[category] || 'bg-slate-700 text-slate-300';
+};
+
+const getCategoryLabel = (category) => {
+    const labels = {
+        achievement: 'Pencapaian',
+        tips: 'Tips & Trik',
+        question: 'Pertanyaan',
+        story: 'Cerita Bisnis'
+    };
+    return labels[category] || category;
+};
+
+const getTimeAgo = (date) => {
+    const now = new Date();
+    const diff = now - date;
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} hari yang lalu`;
+    if (hours > 0) return `${hours} jam yang lalu`;
+    if (minutes > 0) return `${minutes} menit yang lalu`;
+    return 'Baru saja';
+};
+
+// Event Listeners for Community
+communityPostForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    formData.append('title', document.getElementById('post-title').value);
+    formData.append('content', document.getElementById('post-content').value);
+    formData.append('category', document.getElementById('post-category').value);
+    
+    const imageFile = document.getElementById('post-image').files[0];
+    if (imageFile) {
+        formData.append('image', imageFile);
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/community/posts`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: formData
+        });
+
+        if (response.ok) {
+            showMessage('Post berhasil dibagikan!', 'success');
+            communityPostForm.reset();
+            loadCommunityPosts(); // Reload posts
+        } else {
+            const errorData = await response.json();
+            showMessage(errorData.detail || 'Gagal membagikan post.', 'error');
+        }
+    } catch (error) {
+        console.error('Error creating post:', error);
+        showMessage('Terjadi kesalahan saat membagikan post.', 'error');
+    }
+});
+
+// Filter buttons
+filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Update active button
+        filterButtons.forEach(b => {
+            b.classList.remove('bg-indigo-600', 'text-white');
+            b.classList.add('bg-slate-700', 'text-slate-300');
+        });
+        btn.classList.remove('bg-slate-700', 'text-slate-300');
+        btn.classList.add('bg-indigo-600', 'text-white');
+        
+        // Load posts with filter
+        loadCommunityPosts(btn.dataset.category);
+    });
+});
+
+// Post interactions
+communityPostsContainer.addEventListener('click', async (e) => {
+    const postId = e.target.closest('[data-post-id]')?.dataset.postId;
+    
+    if (e.target.closest('.like-btn')) {
+        try {
+            const response = await fetch(`${BASE_URL}/community/posts/${postId}/like`, {
+                method: 'POST',
+                headers: getAuthHeaders()
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const likeBtn = e.target.closest('.like-btn');
+                const heartIcon = likeBtn.querySelector('i');
+                const countSpan = likeBtn.querySelector('span');
+                
+                if (data.liked) {
+                    heartIcon.classList.add('fill-current', 'text-red-400');
+                    countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                } else {
+                    heartIcon.classList.remove('fill-current', 'text-red-400');
+                    countSpan.textContent = parseInt(countSpan.textContent) - 1;
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
+        }
+    }
+    
+    if (e.target.closest('.comment-btn')) {
+        const commentsSection = e.target.closest('.post-card').querySelector('.comments-section');
+        commentsSection.classList.toggle('hidden');
+        
+        if (!commentsSection.classList.contains('hidden')) {
+            loadComments(postId, commentsSection.querySelector('.comments-list'));
+        }
+    }
+});
+
+const loadComments = async (postId, container) => {
+    try {
+        const response = await fetch(`${BASE_URL}/community/posts/${postId}/comments`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+        
+        if (response.ok) {
+            const comments = await response.json();
+            renderComments(comments, container);
+        }
+    } catch (error) {
+        console.error('Error loading comments:', error);
+    }
+};
+
+const renderComments = (comments, container) => {
+    if (comments.length === 0) {
+        container.innerHTML = '<p class="text-slate-400 text-sm">Belum ada komentar.</p>';
+        return;
+    }
+    
+    const commentsHTML = comments.map(comment => {
+        const timeAgo = getTimeAgo(new Date(comment.created_at));
+        return `
+            <div class="flex space-x-2 mb-3">
+                <img src="https://placehold.co/32x32/6366f1/ffffff?text=${comment.author.name.charAt(0).toUpperCase()}" class="rounded-full w-8 h-8" alt="${comment.author.name}">
+                <div class="flex-1">
+                    <div class="bg-slate-700 rounded-lg p-3">
+                        <p class="font-semibold text-sm">${comment.author.name}</p>
+                        <p class="text-sm">${comment.content}</p>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">${timeAgo}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = commentsHTML;
+};
+
+// Update the switchPage function to load community posts when switching to community page
+const originalSwitchPage = switchPage;
+switchPage = (pageId) => {
+    originalSwitchPage(pageId);
+    
+    if (pageId === 'komunitas') {
+        loadCommunityPosts();
+    }
+};
 });

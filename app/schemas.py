@@ -74,3 +74,42 @@ class UserProfileResponse(BaseModel):
     id: int
     name: str
     email: str
+
+class CommunityPostCreate(BaseModel):
+    title: str
+    content: str
+    category: str
+    image_url: Optional[str] = None
+
+class CommunityPostResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    image_url: Optional[str] = None
+    category: str
+    likes_count: int
+    comments_count: int
+    created_at: datetime
+    owner: dict  # Basic user info
+    
+    class Config:
+        from_attributes = True
+
+class CommunityCommentCreate(BaseModel):
+    content: str
+
+class CommunityCommentResponse(BaseModel):
+    id: int
+    content: str
+    created_at: datetime
+    author: dict  # Basic user info
+    
+    class Config:
+        from_attributes = True
+
+class UserPublic(BaseModel):
+    id: int
+    name: str
+    
+    class Config:
+        from_attributes = True

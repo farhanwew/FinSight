@@ -6,10 +6,10 @@ from starlette.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import IS_PROD, BASE_URL
-from app.database import Base, engine # Import Base dan engine untuk create_all
+from app.database import Base, engine
 
 # Import routers
-from app.routers import users, transactions, dashboard, predictions, recommendations, analysis
+from app.routers import users, transactions, dashboard, predictions, recommendations, analysis, community
 
 app = FastAPI(
     docs_url=None if IS_PROD else "/docs",
@@ -51,12 +51,13 @@ app.include_router(dashboard.router)
 app.include_router(predictions.router)
 app.include_router(recommendations.router)
 app.include_router(analysis.router)
+app.include_router(community.router)
 
-# Create tables (pastikan ini dieksekusi saat aplikasi dimulai)
+# Create tables
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True if not IS_PROD else False) # Tambahkan reload untuk dev
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True if not IS_PROD else False)
