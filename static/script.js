@@ -1046,41 +1046,48 @@ const renderCommunityPosts = (posts) => {
             <div class="bg-slate-800 p-6 rounded-lg shadow-lg post-card mb-6" data-post-id="${post.id}">
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex items-center space-x-3">
-                        <img src="https://placehold.co/40x40/6366f1/ffffff?text=${post.owner.name.charAt(0).toUpperCase()}" class="rounded-full" alt="${post.owner.name}">
+                        <img src="https://placehold.co/48x48/6366f1/ffffff?text=${post.owner.name.charAt(0).toUpperCase()}" class="rounded-full w-12 h-12" alt="${post.owner.name}">
                         <div>
-                            <p class="font-semibold">${post.owner.name}</p>
+                            <p class="font-semibold text-indigo-300">${post.owner.name}</p>
                             <p class="text-xs text-slate-400">${timeAgo}</p>
                         </div>
                     </div>
                     <span class="px-3 py-1 text-xs rounded-full ${categoryColor}">${getCategoryLabel(post.category)}</span>
                 </div>
                 
-                <h4 class="font-bold text-lg mb-2">${post.title}</h4>
-                <p class="text-slate-300 mb-4">${post.content}</p>
+                <h4 class="font-bold text-lg mb-3">${post.title}</h4>
+                <p class="text-slate-300 mb-4 leading-relaxed">${post.content}</p>
                 
-                ${post.image_url ? `<img src="${post.image_url}" class="w-full h-48 object-cover rounded-lg mb-4" alt="Post image">` : ''}
+                ${post.image_url ? `
+                    <div class="mb-6">
+                        <img src="${post.image_url}" class="max-w-md w-full h-64 object-cover rounded-lg border border-slate-600 mx-auto" alt="Post image">
+                    </div>
+                ` : ''}
                 
                 <div class="flex items-center justify-between pt-4 border-t border-slate-700">
-                    <div class="flex items-center space-x-4">
-                        <button class="like-btn flex items-center space-x-1 text-slate-400 hover:text-red-400 transition-colors" data-post-id="${post.id}">
-                            <i data-lucide="heart" class="w-4 h-4"></i>
+                    <div class="flex items-center space-x-6">
+                        <button class="like-btn flex items-center space-x-2 text-slate-400 hover:text-red-400 transition-colors" data-post-id="${post.id}">
+                            <i data-lucide="heart" class="w-5 h-5"></i>
                             <span class="like-count">${post.likes_count}</span>
                         </button>
-                        <button class="comment-btn flex items-center space-x-1 text-slate-400 hover:text-indigo-400 transition-colors" data-post-id="${post.id}">
-                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        <button class="comment-btn flex items-center space-x-2 text-slate-400 hover:text-indigo-400 transition-colors" data-post-id="${post.id}">
+                            <i data-lucide="message-circle" class="w-5 h-5"></i>
                             <span class="comment-count">${post.comments_count}</span>
                         </button>
                     </div>
                 </div>
                 
                 <!-- Comments section (initially hidden) -->
-                <div class="comments-section hidden mt-4 pt-4 border-t border-slate-700">
-                    <div class="comments-list mb-4"></div>
-                    <div class="flex space-x-2">
-                        <input type="text" class="comment-input flex-1 bg-slate-700 border border-slate-600 rounded-md p-2 text-sm" placeholder="Tulis komentar..." data-post-id="${post.id}">
-                        <button class="submit-comment-btn bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-md text-sm" data-post-id="${post.id}">
-                            <i data-lucide="send" class="w-4 h-4"></i>
-                        </button>
+                <div class="comments-section hidden mt-6 pt-6 border-t border-slate-700">
+                    <div class="comments-list mb-6 max-h-80 overflow-y-auto pr-2 space-y-4"></div>
+                    <div class="flex space-x-3 bg-slate-700 p-4 rounded-lg">
+                        <img src="https://placehold.co/36x36/6366f1/ffffff?text=${currentUserName ? currentUserName.charAt(0).toUpperCase() : 'U'}" class="rounded-full w-9 h-9 flex-shrink-0" alt="Your avatar">
+                        <div class="flex-1 flex space-x-2">
+                            <input type="text" class="comment-input flex-1 bg-slate-600 border border-slate-500 rounded-md p-3 text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tulis komentar..." data-post-id="${post.id}">
+                            <button class="submit-comment-btn bg-indigo-600 hover:bg-indigo-700 px-4 py-3 rounded-md text-sm transition-colors duration-200" data-post-id="${post.id}">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1328,21 +1335,23 @@ const loadComments = async (postId, container) => {
 
 const renderComments = (comments, container) => {
     if (comments.length === 0) {
-        container.innerHTML = '<p class="text-slate-400 text-sm">Belum ada komentar.</p>';
+        container.innerHTML = '<p class="text-slate-400 text-sm text-center py-4">Belum ada komentar. Jadilah yang pertama berkomentar!</p>';
         return;
     }
     
     const commentsHTML = comments.map(comment => {
         const timeAgo = getTimeAgo(new Date(comment.created_at));
         return `
-            <div class="flex space-x-2 mb-3">
-                <img src="https://placehold.co/32x32/6366f1/ffffff?text=${comment.author.name.charAt(0).toUpperCase()}" class="rounded-full w-8 h-8" alt="${comment.author.name}">
+            <div class="flex space-x-3">
+                <img src="https://placehold.co/40x40/6366f1/ffffff?text=${comment.author.name.charAt(0).toUpperCase()}" class="rounded-full w-10 h-10 flex-shrink-0" alt="${comment.author.name}">
                 <div class="flex-1">
-                    <div class="bg-slate-700 rounded-lg p-3">
-                        <p class="font-semibold text-sm">${comment.author.name}</p>
-                        <p class="text-sm">${comment.content}</p>
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="font-semibold text-sm text-indigo-300">${comment.author.name}</p>
+                            <p class="text-xs text-slate-500">${timeAgo}</p>
+                        </div>
+                        <p class="text-sm text-slate-200 leading-relaxed">${comment.content}</p>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">${timeAgo}</p>
                 </div>
             </div>
         `;
