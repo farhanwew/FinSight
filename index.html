@@ -5,21 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinSight - Financial Insight</title>
     
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Lucide Icons (Correct version for plain JS) -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-    <!-- Custom CSS File -->
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="bg-slate-900 text-white antialiased">
 
-    <!-- Authentication Screen -->
     <div id="auth-screen">
         <div class="flex items-center justify-center min-h-screen bg-slate-900">
             <div class="w-full max-w-md p-8 space-y-6 bg-slate-800 rounded-xl shadow-lg">
@@ -30,7 +25,6 @@
                     </div>
                 </div>
 
-                <!-- Login Form -->
                 <form id="login-form" class="space-y-6">
                     <h2 class="text-xl font-bold text-center">Masuk ke Akun Anda</h2>
                     <div>
@@ -49,7 +43,6 @@
                     </p>
                 </form>
 
-                <!-- Register Form (Initially Hidden) -->
                 <form id="register-form" class="space-y-6 hidden">
                     <h2 class="text-xl font-bold text-center">Buat Akun Baru</h2>
                     <div>
@@ -77,10 +70,8 @@
     </div>
 
 
-    <!-- Main Application Screen (Initially Hidden) -->
     <div id="app-screen" class="hidden">
         <div class="flex h-screen">
-            <!-- Sidebar Navigation -->
             <nav class="w-64 bg-slate-800 p-5 flex flex-col justify-between shadow-lg">
                 <div>
                     <div class="flex items-center space-x-2 mb-10">
@@ -104,7 +95,6 @@
                 </div>
             </nav>
 
-            <!-- Main Content -->
             <main class="flex-1 p-8 overflow-y-auto">
                 <div class="flex justify-between items-center mb-8">
                      <h2 class="text-3xl font-bold" id="page-title">Dashboard</h2>
@@ -121,7 +111,6 @@
                      </div>
                 </div>
 
-                <!-- Profile Dropdown Menu (add this right after the user profile div) -->
                 <div id="profile-dropdown" class="absolute right-8 top-16 bg-slate-800 border border-slate-600 rounded-lg shadow-lg z-50 w-48 hidden">
                     <div class="p-2">
                         <button id="profile-menu-btn" class="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded flex items-center space-x-2">
@@ -135,9 +124,7 @@
                     </div>
                 </div>
 
-                <!-- Page Content Container -->
                 <div id="content-container">
-                    <!-- Dashboard Page -->
                     <div id="page-dashboard" class="page-content">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                             <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
@@ -169,7 +156,6 @@
                         </div>
                     </div>
 
-                    <!-- Manajemen Keuangan Page -->
                     <div id="page-manajemen" class="page-content hidden">
                         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
                             <div class="lg:col-span-2 bg-slate-800 p-6 rounded-lg shadow-lg h-fit">
@@ -215,16 +201,13 @@
                                             </tr>
                                         </thead>
                                         <tbody id="transaction-table-body">
-                                            <!-- Rows will be inserted by JS -->
-                                        </tbody>
+                                            </tbody>
                                     </table>
                                  </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Other pages remain the same -->
-                    <!-- Prediksi Arus Kas Page -->
                     <div id="page-prediksi" class="page-content hidden">
                         <div class="bg-slate-800 p-8 rounded-lg shadow-lg text-center">
                             <h3 class="text-2xl font-bold mb-4">Prediksi Arus Kas Bulan Depan</h3>
@@ -258,7 +241,6 @@
                         </div>
                     </div>
 
-                    <!-- Rekomendasi Usaha Page -->
                     <div id="page-rekomendasi" class="page-content hidden">
                         <div class="bg-slate-800 p-8 rounded-lg shadow-lg">
                              <h3 class="text-2xl font-bold mb-2">Rekomendasi Usaha Berbasis AI</h3>
@@ -290,14 +272,12 @@
                                 <div id="recommendation-output" class="hidden">
                                     <h4 class="font-bold text-xl mb-4">Top 3 Rekomendasi Usaha Untuk Anda:</h4>
                                     <div id="recommendation-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        <!-- Recommendation cards will be inserted here -->
-                                    </div>
+                                        </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Analisis Kelayakan Usaha Page -->
                     <div id="page-analisis" class="page-content hidden">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div class="bg-slate-800 p-6 rounded-lg shadow-lg">
@@ -321,7 +301,6 @@
                             <div id="feasibility-result" class="bg-slate-800 p-6 rounded-lg shadow-lg hidden">
                                 <h3 class="text-xl font-bold mb-4">Hasil Analisis</h3>
                                 
-                                <!-- Tambahkan elemen loading ini -->
                                 <div id="feasibility-loading" class="flex justify-center items-center space-x-2">
                                     <i data-lucide="loader-2" class="animate-spin"></i>
                                     <span>Menganalisis kelayakan usaha...</span>
@@ -330,15 +309,13 @@
                                 <div id="feasibility-output" class="space-y-4 hidden">
                                     <div id="feasibility-status" class="p-4 rounded-md font-bold text-center text-lg"></div>
                                     
-                                    <!-- Elemen baru untuk AI Insight -->
                                     <div class="mt-6 p-4 bg-slate-700 rounded-lg border border-indigo-500">
                                         <h4 class="text-indigo-300 font-semibold mb-2 flex items-center">
                                             <i data-lucide="brain" class="w-5 h-5 mr-2"></i>
                                             AI Insight
                                         </h4>
                                         <p id="feasibility-ai-insight" class="text-slate-300 text-sm leading-relaxed">
-                                            <!-- AI insight akan ditampilkan di sini -->
-                                        </p>
+                                            </p>
                                     </div>
 
                                     <div class="grid grid-cols-2 gap-4">
@@ -361,7 +338,6 @@
                         </div>
                     </div>
                     
-                    <!-- Profile Page (add this with other pages) -->
                     <div id="page-profile" class="page-content hidden">
                         <div class="max-w-2xl mx-auto">
                             <div class="bg-slate-800 p-8 rounded-lg shadow-lg">
@@ -373,7 +349,6 @@
                                 
                                 <h3 class="text-2xl font-bold text-center mb-8">Profil Saya</h3>
                                 
-                                <!-- Update Name Form -->
                                 <div class="bg-slate-700 p-6 rounded-lg mb-6">
                                     <h4 class="font-semibold text-lg mb-4 flex items-center">
                                         <i data-lucide="user" class="w-5 h-5 mr-2 text-indigo-400"></i>
@@ -395,7 +370,6 @@
                                     </form>
                                 </div>
                                 
-                                <!-- Change Password Form -->
                                 <div class="bg-slate-700 p-6 rounded-lg">
                                     <h4 class="font-semibold text-lg mb-4 flex items-center">
                                         <i data-lucide="lock" class="w-5 h-5 mr-2 text-indigo-400"></i>
@@ -424,19 +398,16 @@
                         </div>
                     </div>
 
-                    <!-- Komunitas FinSight Page -->
                     <div id="page-komunitas" class="page-content hidden">
     <div class="mb-6">
         <div class="flex justify-between items-center">
             <h3 class="text-xl font-bold">Feed Komunitas</h3>
             <div class="flex items-center space-x-4">
-                <!-- Create Post Button -->
                 <button id="create-post-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 flex items-center space-x-2">
                     <i data-lucide="plus" class="w-4 h-4"></i>
                     <span>Buat Post</span>
                 </button>
                 
-                <!-- Filter Buttons -->
                 <div class="flex space-x-2">
                     <button class="filter-btn bg-indigo-600 text-white px-3 py-1 rounded text-sm" data-category="">Semua</button>
                     <button class="filter-btn bg-slate-700 text-slate-300 px-3 py-1 rounded text-sm hover:bg-slate-600" data-category="achievement">Pencapaian</button>
@@ -448,9 +419,7 @@
         </div>
     </div>
     
-    <!-- Posts Feed -->
     <div id="community-posts-container">
-        <!-- Posts akan dimuat di sini -->
         <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center">
             <i data-lucide="loader-2" class="animate-spin mx-auto mb-2"></i>
             <p class="text-slate-400">Memuat post komunitas...</p>
@@ -458,7 +427,6 @@
     </div>
 </div>
 
-<!-- Create Post Modal -->
 <div id="create-post-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-slate-800 p-6 rounded-lg shadow-lg w-full max-w-lg mx-4">
         <div class="flex justify-between items-center mb-4">
@@ -509,8 +477,7 @@
     </div>
 
 
-    <!-- Custom JavaScript File -->
     <script src="config.js"></script>
-    <script src="/static/script.js" defer></script>
+    <script type="module" src="/static/js/app.js"></script>
 </body>
 </html>
