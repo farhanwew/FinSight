@@ -90,19 +90,26 @@ export const setupCommunityListeners = () => {
                 if (response.ok) {
                     const data = await response.json();
                     const likeBtn = e.target.closest('.like-btn');
-                    const heartIcon = likeBtn.querySelector('i');
-                    const countSpan = likeBtn.querySelector('.like-count');
+                    // UBAH BARIS INI:
+                    // const heartIcon = likeBtn.querySelector('i'); 
+                    // MENJADI:
+                    const heartIcon = likeBtn.querySelector('svg'); // Mengambil elemen SVG yang dibuat oleh Lucide
+                    const countSpan = likeBtn.querySelector('.like-count'); 
                     
-                    if (data.liked) {
-                        heartIcon.classList.add('fill-current', 'text-red-400');
-                        likeBtn.classList.remove('text-slate-400');
-                        likeBtn.classList.add('text-red-400');
-                        countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                    if (heartIcon && countSpan) { 
+                        if (data.liked) {
+                            heartIcon.classList.add('fill-current', 'text-red-400');
+                            likeBtn.classList.remove('text-slate-400');
+                            likeBtn.classList.add('text-red-400');
+                            countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                        } else {
+                            heartIcon.classList.remove('fill-current', 'text-red-400');
+                            likeBtn.classList.remove('text-red-400');
+                            likeBtn.classList.add('text-slate-400');
+                            countSpan.textContent = parseInt(countSpan.textContent) - 1;
+                        }
                     } else {
-                        heartIcon.classList.remove('fill-current', 'text-red-400');
-                        likeBtn.classList.remove('text-red-400');
-                        likeBtn.classList.add('text-slate-400');
-                        countSpan.textContent = parseInt(countSpan.textContent) - 1;
+                        console.warn("Could not find heart icon (SVG) or like count span for post ID:", postId);
                     }
                 } else {
                     showMessage('Gagal memberikan like.', 'error');
@@ -142,7 +149,9 @@ export const setupCommunityListeners = () => {
                     loadComments(postId, commentsSection.querySelector('.comments-list'));
                     
                     const commentCountSpan = postCard.querySelector('.comment-count');
-                    commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
+                    if (commentCountSpan) { 
+                        commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
+                    }
                     
                     showMessage('Komentar berhasil ditambahkan!', 'success');
                 } else {
@@ -161,7 +170,9 @@ export const setupCommunityListeners = () => {
             e.preventDefault();
             const postCard = e.target.closest('.post-card');
             const submitBtn = postCard.querySelector('.submit-comment-btn');
-            submitBtn.click();
+            if (submitBtn) { 
+                submitBtn.click();
+            }
         }
     });
 };

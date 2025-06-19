@@ -1,12 +1,19 @@
 // static/js/auth.js
 import { authAPI } from './api.js';
 import { setAuthToken, clearAuthToken, showMessage, setCurrentUser, DOMElements } from './utils.js';
-import { initApp, showAuth } from './app.js'; // Hapus showApp dari import
+import { initApp, showAuth } from './app.js';
 
 const loginForm = DOMElements.loginForm;
 const registerForm = DOMElements.registerForm;
 const showRegisterBtn = DOMElements.showRegisterBtn;
 const showLoginBtn = DOMElements.showLoginBtn;
+
+// Fungsi untuk validasi format email
+const isValidEmail = (email) => {
+    // Regex sederhana untuk validasi email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+};
 
 export const setupAuthListeners = () => {
     showRegisterBtn.addEventListener('click', (e) => { 
@@ -23,8 +30,17 @@ export const setupAuthListeners = () => {
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
+        const emailInput = document.getElementById('login-email');
+        const passwordInput = document.getElementById('login-password');
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        // Validasi email
+        if (!isValidEmail(email)) {
+            showMessage('Format email tidak valid. Contoh: user@example.com', 'error');
+            emailInput.focus();
+            return; // Hentikan proses submit
+        }
 
         try {
             const response = await authAPI.login(email, password);
@@ -45,9 +61,28 @@ export const setupAuthListeners = () => {
 
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name = document.getElementById('register-name').value;
-        const email = document.getElementById('register-email').value;
-        const password = document.getElementById('register-password').value;
+        const nameInput = document.getElementById('register-name');
+        const emailInput = document.getElementById('register-email');
+        const passwordInput = document.getElementById('register-password');
+        
+        const name = nameInput.value;
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        // Validasi email
+        if (!isValidEmail(email)) {
+            showMessage('Format email tidak valid. Contoh: user@example.com', 'error');
+            emailInput.focus();
+            return; // Hentikan proses submit
+        }
+        
+        // Validasi password (minimal 6 karakter)
+        if (password.length < 6) {
+            showMessage('Password minimal harus 6 karakter.', 'error');
+            passwordInput.focus();
+            return; // Hentikan proses submit
+        }
+
 
         try {
             const response = await authAPI.register(name, email, password);
