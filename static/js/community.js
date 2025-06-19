@@ -224,7 +224,14 @@ const renderCommunityPosts = (posts) => {
     }
 
     const postsHTML = posts.map(post => {
-        const timeAgo = getTimeAgo(new Date(post.created_at));
+        // Add debugging to see what format the date is in
+        console.log('Post created_at:', post.created_at);
+        
+        // Create a proper date object with explicit parsing
+        const postDate = new Date(post.created_at);
+        console.log('Parsed post date:', postDate);
+        
+        const timeAgo = getTimeAgo(postDate);
         const categoryColor = getCategoryColor(post.category);
         const isOwner = post.owner.id === currentUserId; // Check if the current user is the owner
         

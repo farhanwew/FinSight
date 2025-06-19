@@ -116,13 +116,39 @@ export const showMessage = (message, type = 'info') => {
 };
 
 export const getTimeAgo = (date) => {
+    // Ensure we're working with a proper Date object
+    const postDate = date instanceof Date ? date : new Date(date);
+    
+    // Check if the date is valid
+    if (isNaN(postDate.getTime())) {
+        console.error('Invalid date provided to getTimeAgo:', date);
+        return 'Waktu tidak valid';
+    }
+    
     const now = new Date();
-    const diff = now - date;
+    
+    // Calculate difference in milliseconds
+    const diff = now.getTime() - postDate.getTime();
+    
+    // Log exact calculation for debugging
+    console.log('Post date (ms):', postDate.getTime());
+    console.log('Current time (ms):', now.getTime());
+    console.log('Difference in ms:', diff);
+    
+    // Handle case where date is in the future (server/client time mismatch)
+    if (diff < 0) {
+        return 'Baru saja';
+    }
+    
+    // Calculate time units precisely
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
+    // Log the calculated time units
+    console.log(`Time ago calculation: ${days} days, ${hours % 24} hours, ${minutes % 60} minutes`);
+    
     if (days > 0) return `${days} hari yang lalu`;
     if (hours > 0) return `${hours} jam yang lalu`;
     if (minutes > 0) return `${minutes} menit yang lalu`;
