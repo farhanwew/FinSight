@@ -148,5 +148,12 @@ export const communityAPI = {
             headers: getAuthHeaders()
         });
         return response;
+    },
+    deletePost: async (postId) => { // New function to delete a post
+        const response = await fetch(`${BASE_URL}/community/posts/${postId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        return response;
     }
 };

@@ -1,6 +1,6 @@
 # app/routers/community.py
 
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
+from fastapi import APIRouter, Depends, HTTPException, File, Response, UploadFile, Form, status # Import status for HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import os
@@ -160,3 +160,27 @@ async def get_comments(
         })
     
     return result
+
+# New endpoint for deleting a community post
+@router.delete("/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_post(
+    post_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    post = crud.get_community_post(db, post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    # Ensure only the owner can delete their post
+    if post.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this post")
+    
+    # Optionally delete the image file if it exists
+    if post.image_url and "static/uploads" in post.image_url:
+        file_path = UPLOAD_DIR / post.image_url.split('/')[-1]
+        if file_path.exists():
+            os.remove(file_path)
+
+    crud.delete_community_post(db, post_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

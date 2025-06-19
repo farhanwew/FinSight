@@ -189,3 +189,19 @@ def get_post_comments(db: Session, post_id: int):
     return db.query(CommunityComment).filter(
         CommunityComment.post_id == post_id
     ).order_by(CommunityComment.created_at.asc()).all()
+
+
+
+# New function to delete a community post
+def delete_community_post(db: Session, post_id: int):
+    # Delete associated comments first
+    db.query(CommunityComment).filter(CommunityComment.post_id == post_id).delete()
+    # Delete associated likes
+    db.query(CommunityLike).filter(CommunityLike.post_id == post_id).delete()
+    
+    post = db.query(CommunityPost).filter(CommunityPost.id == post_id).first()
+    if post:
+        db.delete(post)
+        db.commit()
+        return True
+    return False

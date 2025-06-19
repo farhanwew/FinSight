@@ -1,6 +1,6 @@
 // static/js/community.js
 import { communityAPI } from './api.js';
-import { showMessage, getTimeAgo, getCategoryColor, getCategoryLabel, currentUserName, DOMElements } from './utils.js';
+import { showMessage, getTimeAgo, getCategoryColor, getCategoryLabel, currentUserName, currentUserId, DOMElements } from './utils.js'; // Import currentUserId
 
 const communityPostForm = DOMElements.communityPostForm || document.getElementById('community-post-form');
 const communityPostsContainer = DOMElements.communityPostsContainer || document.getElementById('community-posts-container');
@@ -90,10 +90,7 @@ export const setupCommunityListeners = () => {
                 if (response.ok) {
                     const data = await response.json();
                     const likeBtn = e.target.closest('.like-btn');
-                    // UBAH BARIS INI:
-                    // const heartIcon = likeBtn.querySelector('i'); 
-                    // MENJADI:
-                    const heartIcon = likeBtn.querySelector('svg'); // Mengambil elemen SVG yang dibuat oleh Lucide
+                    const heartIcon = likeBtn.querySelector('svg');
                     const countSpan = likeBtn.querySelector('.like-count'); 
                     
                     if (heartIcon && countSpan) { 
@@ -163,6 +160,27 @@ export const setupCommunityListeners = () => {
                 showMessage('Terjadi kesalahan saat menambahkan komentar.', 'error');
             }
         }
+
+        // Handle delete button
+        if (e.target.closest('.delete-post-btn')) {
+            e.preventDefault();
+            const isConfirmed = confirm('Apakah Anda yakin ingin menghapus post ini? Tindakan ini tidak dapat dibatalkan.');
+            if (isConfirmed) {
+                try {
+                    const response = await communityAPI.deletePost(postId);
+                    if (response.ok) {
+                        showMessage('Post berhasil dihapus!', 'success');
+                        loadCommunityPosts(); // Reload posts after deletion
+                    } else {
+                        const errorData = await response.json();
+                        showMessage(errorData.detail || 'Gagal menghapus post.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting post:', error);
+                    showMessage('Terjadi kesalahan saat menghapus post.', 'error');
+                }
+            }
+        }
     });
 
     communityPostsContainer.addEventListener('keypress', (e) => {
@@ -208,6 +226,7 @@ const renderCommunityPosts = (posts) => {
     const postsHTML = posts.map(post => {
         const timeAgo = getTimeAgo(new Date(post.created_at));
         const categoryColor = getCategoryColor(post.category);
+        const isOwner = post.owner.id === currentUserId; // Check if the current user is the owner
         
         return `
             <div class="bg-slate-800 p-6 rounded-lg shadow-lg post-card mb-6" data-post-id="${post.id}">
@@ -219,7 +238,14 @@ const renderCommunityPosts = (posts) => {
                             <p class="text-xs text-slate-400">${timeAgo}</p>
                         </div>
                     </div>
-                    <span class="px-3 py-1 text-xs rounded-full ${categoryColor}">${getCategoryLabel(post.category)}</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="px-3 py-1 text-xs rounded-full ${categoryColor}">${getCategoryLabel(post.category)}</span>
+                        ${isOwner ? `
+                            <button class="delete-post-btn text-red-400 hover:text-red-600 transition-colors" title="Hapus Post">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
                 
                 <h4 class="font-bold text-lg mb-3">${post.title}</h4>
