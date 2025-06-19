@@ -57,8 +57,62 @@ export const destroyChart = (chartId) => {
     }
 };
 
+// MODIFIED: showMessage function for toast notifications
 export const showMessage = (message, type = 'info') => {
-    alert(`${type.toUpperCase()}: ${message}`); // Implementasikan toast/modal yang lebih canggih di sini
+    const notificationContainer = document.getElementById('notification-container');
+    if (!notificationContainer) {
+        console.error('Notification container not found. Make sure to add <div id="notification-container"> to index.html');
+        alert(`${type.toUpperCase()}: ${message}`); // Fallback to alert
+        return;
+    }
+
+    const notification = document.createElement('div');
+    notification.className = `p-4 rounded-md shadow-lg mb-3 flex items-center space-x-3 transition-all duration-300 ease-in-out transform scale-95 opacity-0`;
+    
+    let bgColor, textColor, iconHtml;
+    switch (type) {
+        case 'success':
+            bgColor = 'bg-green-500';
+            textColor = 'text-white';
+            iconHtml = `<i data-lucide="check-circle" class="w-6 h-6"></i>`;
+            break;
+        case 'error':
+            bgColor = 'bg-red-600';
+            textColor = 'text-white';
+            iconHtml = `<i data-lucide="x-circle" class="w-6 h-6"></i>`;
+            break;
+        case 'warning':
+            bgColor = 'bg-yellow-500';
+            textColor = 'text-white';
+            iconHtml = `<i data-lucide="alert-triangle" class="w-6 h-6"></i>`;
+            break;
+        case 'info':
+        default:
+            bgColor = 'bg-blue-500';
+            textColor = 'text-white';
+            iconHtml = `<i data-lucide="info" class="w-6 h-6"></i>`;
+            break;
+    }
+
+    notification.classList.add(bgColor, textColor);
+    notification.innerHTML = `${iconHtml}<span>${message}</span>`;
+    
+    // Add to container and trigger fade-in
+    notificationContainer.appendChild(notification);
+    setTimeout(() => {
+        notification.classList.remove('opacity-0', 'scale-95');
+        notification.classList.add('opacity-100', 'scale-100');
+        lucide.createIcons(); // Render lucide icons for the new notification
+    }, 10); // Small delay to ensure transition works
+
+    // Fade out and remove after 4 seconds
+    setTimeout(() => {
+        notification.classList.remove('opacity-100', 'scale-100');
+        notification.classList.add('opacity-0', 'scale-95');
+        notification.addEventListener('transitionend', () => {
+            notification.remove();
+        });
+    }, 4000);
 };
 
 export const getTimeAgo = (date) => {
@@ -113,5 +167,64 @@ export const DOMElements = {
     profileDropdown: document.getElementById('profile-dropdown'),
     profileMenuBtn: document.getElementById('profile-menu-btn'),
     logoutDropdownBtn: document.getElementById('logout-dropdown-btn'),
-    // ... tambahkan elemen DOM lain yang sering diakses di sini
+    
+    // Elements for analysis.js
+    feasibilityForm: document.getElementById('feasibility-form'),
+    feaModalInput: document.getElementById('fea-modal'),
+    feaBiayaInput: document.getElementById('fea-biaya'),
+    feaPemasukanInput: document.getElementById('fea-pemasukan'),
+    feasibilityResult: document.getElementById('feasibility-result'),
+    feasibilityOutput: document.getElementById('feasibility-output'),
+    feasibilityStatusEl: document.getElementById('feasibility-status'),
+    feaProfitEl: document.getElementById('fea-profit'),
+    feaRoiEl: document.getElementById('fea-roi'),
+    feaBepEl: document.getElementById('fea-bep'),
+    breakEvenChartCanvas: document.getElementById('breakEvenChart'),
+    feasibilityLoading: document.getElementById('feasibility-loading'),
+    feasibilityAiInsightEl: document.getElementById('feasibility-ai-insight'),
+
+    // Elements for predictions.js
+    generatePredictionBtn: document.getElementById('generate-prediction-btn'),
+    predictionResult: document.getElementById('prediction-result'),
+    predictionLoading: document.getElementById('prediction-loading'),
+    predictionOutput: document.getElementById('prediction-output'),
+    predictedIncomeEl: document.getElementById('predicted-income'),
+    predictedExpenseEl: document.getElementById('predicted-expense'),
+    predictionInsightEl: document.getElementById('prediction-insight'),
+
+    // Elements for recommendations.js
+    recModalInput: document.getElementById('rec-modal'),
+    recMinatInput: document.getElementById('rec-minat'),
+    recLokasiInput: document.getElementById('rec-lokasi'),
+    generateRecommendationBtn: document.getElementById('generate-recommendation-btn'),
+    recommendationResult: document.getElementById('recommendation-result'),
+    recommendationLoading: document.getElementById('recommendation-loading'),
+    recommendationOutput: document.getElementById('recommendation-output'),
+    recommendationCardsContainer: document.getElementById('recommendation-cards'),
+
+    // Elements for transactions.js
+    transactionForm: document.getElementById('transaction-form'),
+    transactionTableBody: document.getElementById('transaction-table-body'),
+
+    // Elements for dashboard.js
+    totalPemasukanEl: document.getElementById('total-pemasukan'),
+    totalPengeluaranEl: document.getElementById('total-pengeluaran'),
+    saldoSaatIniEl: document.getElementById('saldo-saat-ini'),
+    totalTransaksiEl: document.getElementById('total-transaksi'),
+
+    // Elements for community.js
+    communityPostForm: document.getElementById('community-post-form'),
+    communityPostsContainer: document.getElementById('community-posts-container'),
+    filterButtons: document.querySelectorAll('.filter-btn'),
+    createPostBtn: document.getElementById('create-post-btn'),
+    createPostModal: document.getElementById('create-post-modal'),
+    closeModalBtn: document.getElementById('close-modal-btn'),
+    cancelPostBtn: document.getElementById('cancel-post-btn'),
+
+    // Elements for profile.js
+    updateNameForm: document.getElementById('update-name-form'),
+    changePasswordForm: document.getElementById('change-password-form'),
+    currentNameInput: document.getElementById('current-name'),
+    newNameInput: document.getElementById('new-name'),
+    profileAvatar: document.getElementById('profile-avatar'),
 };
