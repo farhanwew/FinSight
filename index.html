@@ -481,5 +481,20 @@
 
     <script src="config.js"></script>
     <script type="module" src="/static/js/app.js"></script>
+    <script>
+    // Check if we need to show the register form based on URL parameters
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('register') === 'true') {
+            // Show register form instead of login form
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            if (loginForm && registerForm) {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+            }
+        }
+    });
+</script>
 </body>
 </html>

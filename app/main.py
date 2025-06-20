@@ -35,6 +35,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Route untuk melayani index.html saat root URL diakses
 @app.get("/")
 async def read_root():
+    return FileResponse("landing.html")  # Changed from index.html to landing.html
+
+@app.get("/index.html")
+async def serve_app():
     return FileResponse("index.html")
 
 @app.get("/config.js")

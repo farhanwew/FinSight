@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinSight - Wawasan Keuangan untuk UMKM</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-slate-900 text-white antialiased">
+    <!-- Header/Navigation -->
+    <header class="fixed w-full bg-slate-900/90 backdrop-blur-sm z-10 border-b border-slate-800">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="bar-chart-3" class="text-indigo-400 h-7 w-7"></i>
+                    <h1 class="text-2xl font-bold">FinSight</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-8">
+                        <li><a href="#fitur" class="text-slate-300 hover:text-indigo-400 transition-colors">Fitur</a></li>
+                        <li><a href="#manfaat" class="text-slate-300 hover:text-indigo-400 transition-colors">Manfaat</a></li>
+                        <li><a href="#testimoni" class="text-slate-300 hover:text-indigo-400 transition-colors">Testimoni</a></li>
+                    </ul>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <a href="/index.html" class="px-4 py-2 rounded-md border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white transition-colors">Masuk</a>
+                    <a href="/index.html?register=true" class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 transition-colors">Daftar</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center py-20 px-6">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <h1 class="text-5xl font-bold leading-tight">
+                        Kelola Keuangan UMKM dengan 
+                        <span class="text-indigo-400">Cerdas</span>
+                    </h1>
+                    <p class="text-xl text-slate-300">
+                        FinSight membantu UMKM mengambil keputusan bisnis lebih baik dengan analisis keuangan cerdas, prediksi arus kas, dan rekomendasi usaha berbasis AI.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="/index.html?register=true" class="px-6 py-3 text-center rounded-md bg-indigo-600 hover:bg-indigo-700 transition-colors text-lg font-semibold">
+                            Mulai Gratis
+                        </a>
+                        <a href="#fitur" class="px-6 py-3 text-center rounded-md border border-slate-600 hover:bg-slate-800 transition-colors text-lg">
+                            Pelajari Lebih Lanjut
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-indigo-500/20 rounded-lg p-4 border border-indigo-500/40">
+                        <img src="/static/images/image.png" alt="FinSight Dashboard Preview" class="rounded-lg shadow-lg" onerror="this.src='https://placehold.co/600x400/1e293b/6366f1?text=FinSight+Dashboard'">
+                    </div>
+                    <div class="absolute -bottom-6 -left-6 bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-700">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-green-500/20 p-2 rounded-full">
+                                <i data-lucide="trending-up" class="text-green-400 h-6 w-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-slate-400">Prediksi Bulan Depan</p>
+                                <p class="font-bold text-green-400">↑ 24% Peningkatan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="fitur" class="py-20 bg-slate-800">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Fitur Unggulan FinSight</h2>
+                <p class="text-slate-300 max-w-2xl mx-auto">Solusi komprehensif untuk membantu UMKM mengelola keuangan dan mengembangkan bisnis mereka dengan lebih efektif.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600">
+                    <div class="bg-indigo-600/30 p-3 rounded-full w-fit mb-4">
+                        <i data-lucide="wallet" class="text-indigo-400 h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Manajemen Keuangan</h3>
+                    <p class="text-slate-300">Lacak pemasukan dan pengeluaran dengan mudah. Kategorisasi otomatis dan visualisasi data untuk melihat aliran kas bisnis Anda.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600">
+                    <div class="bg-indigo-600/30 p-3 rounded-full w-fit mb-4">
+                        <i data-lucide="trending-up" class="text-indigo-400 h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Prediksi Arus Kas</h3>
+                    <p class="text-slate-300">Dapatkan prediksi akurat tentang arus kas masa depan berdasarkan data historis dan pola pengeluaran Anda.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600">
+                    <div class="bg-indigo-600/30 p-3 rounded-full w-fit mb-4">
+                        <i data-lucide="lightbulb" class="text-indigo-400 h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Rekomendasi Usaha</h3>
+                    <p class="text-slate-300">AI kami akan memberikan rekomendasi bisnis yang paling cocok berdasarkan modal, minat, dan lokasi Anda.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600">
+                    <div class="bg-indigo-600/30 p-3 rounded-full w-fit mb-4">
+                        <i data-lucide="ruler" class="text-indigo-400 h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Analisis Kelayakan</h3>
+                    <p class="text-slate-300">Nilai kelayakan usaha Anda dengan perhitungan ROI, Break-Even Point, dan insight AI tentang prospek bisnis.</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600">
+                    <div class="bg-indigo-600/30 p-3 rounded-full w-fit mb-4">
+                        <i data-lucide="users" class="text-indigo-400 h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Komunitas UMKM</h3>
+                    <p class="text-slate-300">Bergabung dengan komunitas pelaku UMKM untuk berbagi pengalaman, tips, dan mendapatkan dukungan.</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600">
+                    <div class="bg-indigo-600/30 p-3 rounded-full w-fit mb-4">
+                        <i data-lucide="brain" class="text-indigo-400 h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Insight Otomatis</h3>
+                    <p class="text-slate-300">Dapatkan insight yang dibuat oleh AI berdasarkan data keuangan Anda untuk membantu pengambilan keputusan.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="manfaat" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Manfaat Menggunakan FinSight</h2>
+                <p class="text-slate-300 max-w-2xl mx-auto">Bukan sekadar aplikasi keuangan, FinSight adalah partner bisnis yang membantu UMKM bertumbuh.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <img src="/static/images/benefits.png" alt="FinSight Benefits" class="rounded-lg shadow-lg" onerror="this.src='https://placehold.co/600x400/1e293b/6366f1?text=Manfaat+FinSight'">
+                </div>
+                
+                <div class="space-y-8">
+                    <div class="flex space-x-4">
+                        <div class="bg-green-600/30 p-2 rounded-full h-fit">
+                            <i data-lucide="check" class="text-green-400 h-6 w-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Hemat Waktu</h3>
+                            <p class="text-slate-300">Otomatisasi pengelolaan keuangan membebaskan waktu Anda untuk fokus pada pengembangan bisnis.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-4">
+                        <div class="bg-green-600/30 p-2 rounded-full h-fit">
+                            <i data-lucide="check" class="text-green-400 h-6 w-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Keputusan Lebih Baik</h3>
+                            <p class="text-slate-300">Data dan analisis yang komprehensif membantu Anda membuat keputusan bisnis yang lebih terinformasi.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-4">
+                        <div class="bg-green-600/30 p-2 rounded-full h-fit">
+                            <i data-lucide="check" class="text-green-400 h-6 w-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Pertumbuhan Bisnis</h3>
+                            <p class="text-slate-300">Rekomendasi yang dipersonalisasi membantu mengidentifikasi peluang pertumbuhan yang paling potensial.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-4">
+                        <div class="bg-green-600/30 p-2 rounded-full h-fit">
+                            <i data-lucide="check" class="text-green-400 h-6 w-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Mitigasi Risiko</h3>
+                            <p class="text-slate-300">Prediksi arus kas dan analisis kelayakan membantu mengidentifikasi dan mengelola risiko potensial.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimoni" class="py-20 bg-slate-800">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Apa Kata Pengguna Kami</h2>
+                <p class="text-slate-300 max-w-2xl mx-auto">Dengar langsung dari pelaku UMKM yang telah menggunakan FinSight.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600 relative">
+                    <div class="text-indigo-400 text-5xl font-serif absolute -top-5 -left-2">"</div>
+                    <p class="text-slate-300 mb-6 pt-4">FinSight membantu saya melihat pola pengeluaran yang tidak efisien. Berkat prediksi arus kas, saya bisa mengantisipasi bulan-bulan sepi dan mengelola keuangan dengan lebih baik.</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center">
+                            <span class="font-bold">DS</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Dewi Sartika</p>
+                            <p class="text-sm text-slate-400">Pemilik Warung Makan</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600 relative">
+                    <div class="text-indigo-400 text-5xl font-serif absolute -top-5 -left-2">"</div>
+                    <p class="text-slate-300 mb-6 pt-4">Fitur analisis kelayakan sangat membantu saat saya ingin membuka cabang baru. Kalkulator ROI dan BEP memberikan gambaran jelas kapan investasi saya akan kembali.</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center">
+                            <span class="font-bold">BP</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Budi Prakoso</p>
+                            <p class="text-sm text-slate-400">Pengusaha Fashion</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600 relative">
+                    <div class="text-indigo-400 text-5xl font-serif absolute -top-5 -left-2">"</div>
+                    <p class="text-slate-300 mb-6 pt-4">Komunitas di FinSight luar biasa! Saya mendapatkan banyak tips dari pengusaha lain dan bahkan menemukan supplier baru melalui rekomendasi anggota komunitas.</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center">
+                            <span class="font-bold">RA</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Rina Agustina</p>
+                            <p class="text-sm text-slate-400">UMKM Handcraft</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-indigo-900/50">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-6">Siap Mengelola Keuangan dengan Lebih Cerdas?</h2>
+            <p class="text-xl text-slate-300 mb-8 max-w-3xl mx-auto">Bergabunglah dengan ribuan pelaku UMKM yang telah meningkatkan bisnis mereka dengan FinSight</p>
+            <a href="/index.html?register=true" class="inline-block px-8 py-4 rounded-md bg-indigo-600 hover:bg-indigo-700 transition-colors text-lg font-semibold">
+                Mulai Sekarang - Gratis!
+            </a>
+            <p class="mt-4 text-slate-400">Tidak perlu kartu kredit. Langsung akses semua fitur.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 py-12 border-t border-slate-700">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i data-lucide="bar-chart-3" class="text-indigo-400 h-6 w-6"></i>
+                        <h3 class="text-xl font-bold">FinSight</h3>
+                    </div>
+                    <p class="text-slate-400">Platform manajemen keuangan berbasis AI untuk UMKM Indonesia.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Navigasi</h4>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="#" class="hover:text-indigo-400 transition-colors">Beranda</a></li>
+                        <li><a href="#fitur" class="hover:text-indigo-400 transition-colors">Fitur</a></li>
+                        <li><a href="#manfaat" class="hover:text-indigo-400 transition-colors">Manfaat</a></li>
+                        <li><a href="#testimoni" class="hover:text-indigo-400 transition-colors">Testimoni</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Dukungan</h4>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="#" class="hover:text-indigo-400 transition-colors">Pusat Bantuan</a></li>
+                        <li><a href="#" class="hover:text-indigo-400 transition-colors">Dokumentasi</a></li>
+                        <li><a href="#" class="hover:text-indigo-400 transition-colors">Kontak</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="#" class="hover:text-indigo-400 transition-colors">Kebijakan Privasi</a></li>
+                        <li><a href="#" class="hover:text-indigo-400 transition-colors">Syarat & Ketentuan</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-700 mt-12 pt-8 text-center">
+                <p class="text-slate-500">© 2025 FinSight. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
