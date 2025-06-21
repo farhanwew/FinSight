@@ -127,9 +127,12 @@ export const getTimeAgo = (date) => {
     
     const now = new Date();
     
-    // Account for 7-hour difference (UTC+7 timezone)
-    // Alternatively, use the actual timezone offset: const offset = now.getTimezoneOffset() * 60000;
-    const timezoneOffset = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
+    // Deteksi timezone pengguna secara dinamis
+    // getTimezoneOffset() mengembalikan nilai dalam menit, negatif untuk timezone timur UTC
+    // Perlu dikali -1 karena getTimezoneOffset() mengembalikan nilai negatif untuk UTC+
+    const timezoneOffsetMinutes = -1 * now.getTimezoneOffset();
+    const timezoneOffset = timezoneOffsetMinutes * 60 * 1000; // Konversi menit ke milidetik
+    
     const adjustedPostDate = new Date(postDate.getTime() + timezoneOffset);
     
     // Calculate difference in milliseconds
