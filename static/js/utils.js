@@ -127,27 +127,24 @@ export const getTimeAgo = (date) => {
     
     const now = new Date();
     
+    // Account for 7-hour difference (UTC+7 timezone)
+    // Alternatively, use the actual timezone offset: const offset = now.getTimezoneOffset() * 60000;
+    const timezoneOffset = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
+    const adjustedPostDate = new Date(postDate.getTime() + timezoneOffset);
+    
     // Calculate difference in milliseconds
-    const diff = now.getTime() - postDate.getTime();
+    const diff = now - adjustedPostDate;
     
-    // Log exact calculation for debugging
-    console.log('Post date (ms):', postDate.getTime());
-    console.log('Current time (ms):', now.getTime());
-    console.log('Difference in ms:', diff);
-    
-    // Handle case where date is in the future (server/client time mismatch)
-    if (diff < 0) {
+    // Handle case where date is very recent
+    if (diff < 60000) { // If less than 1 minute
         return 'Baru saja';
     }
     
-    // Calculate time units precisely
+    // Calculate time units
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-
-    // Log the calculated time units
-    console.log(`Time ago calculation: ${days} days, ${hours % 24} hours, ${minutes % 60} minutes`);
     
     if (days > 0) return `${days} hari yang lalu`;
     if (hours > 0) return `${hours} jam yang lalu`;
