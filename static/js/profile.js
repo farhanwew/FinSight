@@ -1,6 +1,6 @@
 // static/js/profile.js
 import { authAPI } from './api.js';
-import { showMessage, currentUserName, setCurrentUser, DOMElements } from './utils.js';
+import { showMessage, currentUserName, setCurrentUser, DOMElements, showLogoutConfirmation } from './utils.js';
 
 const userProfileTrigger = DOMElements.userProfileTrigger;
 const profileDropdown = DOMElements.profileDropdown;
@@ -37,7 +37,7 @@ export const setupProfileListeners = (switchPageCallback, handleLogoutCallback) 
 
     logoutDropdownBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        handleLogoutCallback();
+        showLogoutConfirmation(handleLogoutCallback);
     });
 
     updateNameForm.addEventListener('submit', async (e) => {

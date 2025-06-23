@@ -1,5 +1,5 @@
 // static/js/app.js
-import { authToken, currentUserName, setCurrentUser, DOMElements } from './utils.js';
+import { authToken, currentUserName, setCurrentUser, DOMElements, showLogoutConfirmation } from './utils.js';
 import { setupAuthListeners, handleLogout } from './auth.js';
 import { renderDashboard } from './dashboard.js';
 import { setupTransactionListeners, fetchTransactionsAndRefresh } from './transactions.js';
@@ -23,6 +23,9 @@ const logoutBtn = DOMElements.logoutBtn;
 
 // Core App Logic
 export const switchPage = async (pageId) => {
+    // Store current page in localStorage
+    localStorage.setItem('lastActivePage', pageId);
+    
     pageContents.forEach(page => page.classList.add('hidden'));
     const activePage = document.getElementById(`page-${pageId}`);
     if (activePage) activePage.classList.remove('hidden');
@@ -65,8 +68,10 @@ export const initApp = async () => {
             
             // Initial data load for dashboard and transactions
             await fetchTransactionsAndRefresh();
-            await renderDashboard(); // Initial render of dashboard with data
-            switchPage('dashboard'); // Set default page
+            
+            // Get last active page from localStorage or default to dashboard
+            const lastPage = localStorage.getItem('lastActivePage') || 'dashboard';
+            switchPage(lastPage);
         } else {
             console.error('Error fetching user info after auto-login, response not ok.');
             handleLogout(); // Force logout if token is invalid
@@ -110,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Logout button in sidebar
     logoutBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        handleLogout();
+        showLogoutConfirmation(handleLogout);
     });
 
     // Auto-login if token exists

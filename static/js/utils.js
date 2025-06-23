@@ -254,3 +254,32 @@ export const DOMElements = {
     newNameInput: document.getElementById('new-name'),
     profileAvatar: document.getElementById('profile-avatar'),
 };
+
+export const showLogoutConfirmation = (onConfirm) => {
+    const modal = document.getElementById('logout-confirmation-modal');
+    const closeBtn = document.getElementById('close-logout-modal');
+    const cancelBtn = document.getElementById('cancel-logout');
+    const confirmBtn = document.getElementById('confirm-logout');
+    
+    const closeModal = () => {
+        modal.classList.add('hidden');
+    };
+    
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    
+    // Set up the confirm button with a one-time event listener
+    const confirmHandler = () => {
+        closeModal();
+        onConfirm();
+        confirmBtn.removeEventListener('click', confirmHandler);
+    };
+    
+    confirmBtn.addEventListener('click', confirmHandler);
+    
+    // Show the modal
+    modal.classList.remove('hidden');
+    
+    // Re-render Lucide icons for the new modal content
+    lucide.createIcons();
+};
