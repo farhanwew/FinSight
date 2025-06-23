@@ -60,6 +60,39 @@ CREATE TABLE feasibility_analyses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabel Community Posts
+CREATE TABLE community_posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title VARCHAR(200) NOT NULL,
+    content TEXT NOT NULL,
+    image_url VARCHAR(500),
+    category VARCHAR(50) NOT NULL,
+    likes_count INTEGER DEFAULT 0,
+    comments_count INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabel Community Comments
+CREATE TABLE community_comments (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabel Community Likes
+CREATE TABLE community_likes (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(post_id, user_id) -- Prevent duplicate likes from same user
+);
+
 -- Index untuk performa query
 CREATE INDEX idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX idx_transactions_date ON transactions(date);
@@ -67,6 +100,13 @@ CREATE INDEX idx_transactions_type ON transactions(type);
 CREATE INDEX idx_business_recommendations_user_id ON business_recommendations(user_id);
 CREATE INDEX idx_cash_flow_predictions_user_id ON cash_flow_predictions(user_id);
 CREATE INDEX idx_feasibility_analyses_user_id ON feasibility_analyses(user_id);
+CREATE INDEX idx_community_posts_user_id ON community_posts(user_id);
+CREATE INDEX idx_community_posts_category ON community_posts(category);
+CREATE INDEX idx_community_posts_created_at ON community_posts(created_at);
+CREATE INDEX idx_community_comments_post_id ON community_comments(post_id);
+CREATE INDEX idx_community_comments_user_id ON community_comments(user_id);
+CREATE INDEX idx_community_likes_post_id ON community_likes(post_id);
+CREATE INDEX idx_community_likes_user_id ON community_likes(user_id);
 
 -- -- Sample data untuk testing
 -- INSERT INTO users (name, email, password_hash) VALUES 

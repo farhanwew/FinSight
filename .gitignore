@@ -3,4 +3,4 @@ venv/
 README.md
 __pycache__/
 uploads/
-script.js
+statics/script.js
