@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from starlette.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+import time
+import sys
 
 from app.config import IS_PROD, BASE_URL
 from app.database import Base, engine
@@ -60,7 +62,23 @@ app.include_router(community.router)
 # Create tables
 @app.on_event("startup")
 def on_startup():
-    Base.metadata.create_all(bind=engine)
+    max_retries = 5
+    retry_delay = 5
+    
+    for attempt in range(max_retries):
+        try:
+            print(f"Attempting to connect to database (attempt {attempt + 1}/{max_retries})...")
+            Base.metadata.create_all(bind=engine)
+            print("Database connection successful!")
+            break
+        except Exception as e:
+            print(f"Database connection failed: {e}")
+            if attempt < max_retries - 1:
+                print(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print("Max retries reached. Exiting...")
+                sys.exit(1)
 
 if __name__ == "__main__":
     import uvicorn
