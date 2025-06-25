@@ -6,7 +6,6 @@ from app.config import OPENROUTER_API_KEY, OPENROUTER_API_URL, MODEL_NAME
 from typing import List, Dict, Any, Optional
 
 async def get_business_recommendations_from_llm(modal: float, minat: Optional[str], lokasi: Optional[str]) -> List[Dict[str, Any]]:
-    # ... (kode yang sudah ada untuk rekomendasi bisnis) ...
     prompt_parts = [
         f"Berikan 3 rekomendasi usaha UMKM berdasarkan kriteria berikut:",
         f"- Modal tersedia: Rp {modal:,.0f}",

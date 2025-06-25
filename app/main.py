@@ -11,7 +11,7 @@ from app.config import IS_PROD, BASE_URL
 from app.database import Base, engine
 
 # Import routers
-from app.routers import users, transactions, dashboard, predictions, recommendations, analysis, community
+from app.routers import users, transactions, dashboard, predictions, recommendations, analysis, community, reports
 
 app = FastAPI(
     docs_url=None if IS_PROD else "/docs",
@@ -58,6 +58,7 @@ app.include_router(predictions.router)
 app.include_router(recommendations.router)
 app.include_router(analysis.router)
 app.include_router(community.router)
+app.include_router(reports.router)
 
 # Create tables
 @app.on_event("startup")

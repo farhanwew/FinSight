@@ -9,6 +9,7 @@ import { setupAnalysisListeners } from './analysis.js';
 import { setupCommunityListeners, loadCommunityPosts } from './community.js';
 import { setupProfileListeners, showProfilePage } from './profile.js';
 import { authAPI } from './api.js';
+import './financial-report.js'; // Import financial report module
 
 // DOM Elements
 const authScreen = DOMElements.authScreen;

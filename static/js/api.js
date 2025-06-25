@@ -157,3 +157,13 @@ export const communityAPI = {
         return response;
     }
 };
+
+export const reportsAPI = {
+    getFinancialReport: async (startDate, endDate) => {
+        const response = await fetch(`${BASE_URL}/reports/financial?start_date=${startDate}&end_date=${endDate}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+        return response;
+    }
+};

@@ -2,6 +2,7 @@
 import { transactionsAPI } from './api.js';
 import { showMessage, formatCurrency, currentUserTransactions, setCurrentUserTransactions, DOMElements } from './utils.js';
 import { renderDashboard } from './dashboard.js'; // Import renderDashboard untuk refresh data
+import { setupReportListeners } from './financial-report.js';
 
 const transactionForm = DOMElements.transactionForm || document.getElementById('transaction-form');
 const transactionTableBody = DOMElements.transactionTableBody || document.getElementById('transaction-table-body');
@@ -45,6 +46,8 @@ export const setupTransactionListeners = () => {
             deleteTransaction(parseInt(deleteButton.dataset.id, 10)); 
         } 
     });
+
+    setupReportListeners();
 };
 
 export const fetchTransactionsAndRefresh = async () => {

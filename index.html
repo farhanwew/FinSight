@@ -206,6 +206,29 @@
                                  </div>
                             </div>
                         </div>
+                        <div class="lg:col-span-5 bg-slate-800 p-6 rounded-lg shadow-lg mt-6">
+                            <h3 class="font-semibold text-xl mb-4">Laporan Keuangan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label for="report-start-date" class="block text-sm font-medium text-slate-300">Tanggal Mulai</label>
+                                    <input type="date" id="report-start-date" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1">
+                                </div>
+                                <div>
+                                    <label for="report-end-date" class="block text-sm font-medium text-slate-300">Tanggal Akhir</label>
+                                    <input type="date" id="report-end-date" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 mt-1">
+                                </div>
+                            </div>
+                            <div class="flex justify-center">
+                                <button id="generate-report-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition-colors duration-200 flex items-center">
+                                    <i data-lucide="file-text" class="inline-block mr-2"></i>
+                                    Unduh Laporan PDF
+                                </button>
+                            </div>
+                            <div id="report-loading" class="hidden mt-4 flex justify-center items-center space-x-2">
+                                <i data-lucide="loader-2" class="animate-spin"></i>
+                                <span>Menyiapkan laporan...</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="page-prediksi" class="page-content hidden">

@@ -12,3 +12,4 @@ python-dotenv==1.0.0
 alembic==1.12.1
 pydantic[email]
 httpx
+reportlab==3.6.12
