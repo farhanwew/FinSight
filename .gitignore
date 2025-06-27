@@ -1,6 +1,5 @@
 venv/
 .env
-README.md
 __pycache__/
 uploads/
 statics/script.js
